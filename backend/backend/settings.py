@@ -20,8 +20,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+INSTALLED_APPS += [
     'rest_framework',
     'rest_framework.authtoken',
+]
+
+INSTALLED_APPS += [
+    'recipe.apps.RecipeConfig',
     'api.apps.ApiConfig',
 ]
 
@@ -63,7 +70,7 @@ if os.getenv('USE_POSTGRES_DB', default='False') == 'True':
             'USER': os.getenv('POSTGRES_USER', 'django'),
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
             'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432)
+            'PORT': os.getenv('DB_PORT', '5432')
         }
     }
 else:
