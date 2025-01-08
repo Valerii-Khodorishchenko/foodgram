@@ -27,3 +27,15 @@ DB_PORT=5432
 ```bash
 nano .env
 ```
+
+### Как заполнить db ингридиентами из .CSV или .JSON файла
+В проекте реализована возможность добавления ингридиентов в базу данных 
+без дублирования ингридиентов.
+Команды для добавления:
+```bash
+python manage.py load_ingredients path_to_file/ingredients.csv
+```
+
+```bash
+python manage.py load_ingredients path_to_file/ingredients.json
+```
