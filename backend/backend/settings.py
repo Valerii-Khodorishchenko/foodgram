@@ -24,7 +24,7 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'rest_framework',
-    'corsheaders',  # TODO: Не добавляй в Git
+    'corsheaders',
     'rest_framework.authtoken',
     'debug_toolbar',
 ]
@@ -37,7 +37,7 @@ INSTALLED_APPS += [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # TODO: Не добавляй в Git
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -122,7 +122,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,  # TODO: Может константой
+    'PAGE_SIZE': 10,
 }
 
 AUTH_USER_MODEL = 'recipe.User'
@@ -130,7 +130,6 @@ AUTH_USER_MODEL = 'recipe.User'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# TODO: Не добавляй в Git
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
 ]
