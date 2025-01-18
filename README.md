@@ -1,6 +1,10 @@
-Находясь в папке infra, выполните команду docker-compose up. При выполнении этой команды контейнер frontend, описанный в docker-compose.yml, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
+Находясь в папке infra, выполните команду docker-compose up. При выполнении 
+этой команды контейнер frontend, описанный в docker-compose.yml, подготовит 
+файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою 
+работу.
 
-По адресу http://localhost изучите фронтенд веб-приложения, а по адресу http://localhost/api/docs/ — спецификацию API.
+По адресу http://localhost изучите фронтенд веб-приложения, а по адресу 
+http://localhost/api/docs/ — спецификацию API.
 
 ### Как заполнить ```.env``` :
 ```nano
@@ -20,7 +24,8 @@ DB_PORT=5432
 - `DEBUG` — указывает, включен ли режим отладки.
 - `ALLOWED_HOSTS` — список разрешенных хостов.
 - `USE_POSTGRES_DB` — использовать PostgreSQL или оставить SQLite
-- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — параметры для подключения к PostgreSQL.
+- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — параметры для
+подключения к PostgreSQL.
 - `DB_HOST`, `DB_PORT` — хост и порт базы данных.
 
 Создать и открыть для заполнения .env можно командой:
@@ -39,3 +44,5 @@ python manage.py load_ingredients path_to_file/ingredients.csv
 ```bash
 python manage.py load_ingredients path_to_file/ingredients.json
 ```
+-  ```path_to_file``` путь к директории с файлами для заполнения db формате
+```.csv``` и ```.json```
