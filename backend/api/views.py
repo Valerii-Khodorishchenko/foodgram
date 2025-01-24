@@ -187,28 +187,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             short_id = hashids.encode(recipe.id)
             short_url = request.build_absolute_uri(
                 reverse('recipe-short-url', kwargs={'short_id': short_id}))
-            return Response({'short-link': short_url}, status=status.HTTP_200_OK)
-            # front_end_url = 'https://localhost:3000/s/' + short_id
-            # return Response({'short-link': front_end_url}, status=status.HTTP_200_OK)
+            return Response(
+                {'short-link': short_url},
+                status=status.HTTP_200_OK
+            )
         except Recipe.DoesNotExist:
             return Response(
                 {'detail': 'Рецепт не найден.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-    # @action(detail=True, methods=('get',), url_path='get-link')
-    # def get_link(self, request, pk):
-    #     try:
-    #         recipe = self.get_object()
-    #         serializer = RecipeLinkSerializer(
-    #             recipe, context={'request': request}
-    #         )
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     except Recipe.DoesNotExist:
-    #         return Response(
-    #             {'detail': 'Рецепт не найден.'},
-    #             status=status.HTTP_404_NOT_FOUND
-    #         )
 
     @action(
         detail=True, methods=('post', 'delete'), url_path='favorite',

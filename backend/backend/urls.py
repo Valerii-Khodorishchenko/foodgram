@@ -9,7 +9,10 @@ from recipe.apps import custom_admin_site
 urlpatterns = [
     path('admin/', custom_admin_site.urls),
     path('api/', include('api.urls')),
-    path('recipes/<int:pk>/', RecipeViewSet.as_view({'get': 'retrieve'}), name='recipe-detail'),
+    path(
+        'recipes/<int:pk>/', RecipeViewSet.as_view({'get': 'retrieve'}),
+        name='recipe-detail'
+    ),
 ]
 
 if settings.DEBUG:
