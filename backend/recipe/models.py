@@ -130,7 +130,7 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(Tag, verbose_name='Теги')
     image = models.ImageField(
-        'Изображение блюда', upload_to='dishes/', max_length=MAX_URL_SIZE,
+        'Изображение блюда', upload_to='food image', max_length=MAX_URL_SIZE,
         help_text=f'Загрузите изображение рецепта(до {MAX_SIZE_IMG}Мб).',
         validators=[validate_image_size]
     )
