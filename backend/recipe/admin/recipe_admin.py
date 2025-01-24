@@ -55,7 +55,7 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
     def ingredient_list(self, recipe):
         ingredients = recipe.components.all()
         return format_html('<br> '.join(
-            f'{ingredient.ingredient.name} - {ingredient.quantity}'
+            f'{ingredient.ingredient.name} - {ingredient.amount}'
             f'{ingredient.ingredient.measurement_unit}'
             for ingredient in ingredients
         ))
@@ -85,7 +85,7 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
 class RecipeIngredientInline(admin.TabularInline):
     model = RecipeComponent
     extra = 1
-    fields = ('ingredient', 'quantity', 'measurement_unit')
+    fields = ('ingredient', 'amount', 'measurement_unit')
     readonly_fields = ('measurement_unit',)
 
     def get_queryset(self, request):

@@ -7,6 +7,7 @@ from recipe.constants import ITEMS_PER_PAGE
 from recipe.models import User
 from recipe.validators import validate_image_size
 
+
 class UserForm(ImagePreviewMixin, UserChangeForm):
     class Meta:
         model = User

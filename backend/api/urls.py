@@ -1,10 +1,20 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from api.views import UserViewSet, LoginView, logout
+from api.views import (
+    IngredientViewSet,
+    LoginView,
+    logout,
+    UserViewSet,
+    RecipeViewSet,
+    TagViewSet
+)
 
 router_v1 = DefaultRouter()
 router_v1.register('users', UserViewSet, basename='users')
+router_v1.register('recipes', RecipeViewSet, basename='recipes')
+router_v1.register('tags', TagViewSet, basename='tags')
+router_v1.register('ingredients', IngredientViewSet, basename='ingredients')
 
 auth_patterns = [
     path('login/', LoginView.as_view(), name='login'),

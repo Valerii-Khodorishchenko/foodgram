@@ -180,7 +180,7 @@ class RecipeComponent(models.Model):
         Recipe, on_delete=models.CASCADE, verbose_name='Рецепт')
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
-    quantity = models.PositiveSmallIntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Количество ингредиента', validators=[MinValueValidator(1)],
         help_text='Количество ингредиента'
     )
@@ -190,9 +190,15 @@ class RecipeComponent(models.Model):
         verbose_name = 'Компонент блюда'
         verbose_name_plural = 'Компоненты блюд'
         ordering = ('recipe',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='ingredient_in_recipe'
+            )
+        ]
 
     def __str__(self):
-        return f'{self.ingredient.name[:DESCRIPTION_LENGTH]} ({self.quantity})'
+        return f'{self.ingredient.name[:DESCRIPTION_LENGTH]} ({self.amount})'
 
 
 def delete_file(file_field):

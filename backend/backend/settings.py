@@ -27,6 +27,7 @@ INSTALLED_APPS += [
     'corsheaders',
     'rest_framework.authtoken',
     'debug_toolbar',
+    'django_filters',
 ]
 
 INSTALLED_APPS += [
@@ -111,6 +112,8 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
