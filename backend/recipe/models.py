@@ -149,6 +149,10 @@ class Recipe(models.Model):
         User, verbose_name='Автор', on_delete=models.CASCADE,
         help_text='Пользователь добавивший рецепт'
     )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации',
+        help_text='Дата и время создания рецепта'
+    )
 
     def delete_image(self):
         delete_file(self.image)
@@ -169,7 +173,7 @@ class Recipe(models.Model):
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('name',)
+        ordering = ('-created_at',)
 
     def __str__(self):
         return self.name[:DESCRIPTION_LENGTH]

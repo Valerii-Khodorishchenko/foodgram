@@ -24,10 +24,8 @@ class RecipeFilter(django_filters.FilterSet):
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
     def filter_tags(self, queryset, name, value):
-        response = queryset
-        for tag in value:
-            response = response.filter(tags__slug=tag.slug)
-        return response
+        slugs = [tag.slug for tag in value]
+        return queryset.filter(tags__slug__in=slugs).distinct()
 
     def filter_is_favorited(self, queryset, name, value):
         if self.request.user.is_authenticated and value == '1':
