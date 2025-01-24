@@ -140,3 +140,6 @@ CORS_ALLOWED_ORIGINS = [
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+HASHIDS_SALT = os.getenv('SECRET_KEY', default='default_secret_key')
+HASHIDS_MIN_LENGTH = 6

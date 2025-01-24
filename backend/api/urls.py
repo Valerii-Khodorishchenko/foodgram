@@ -7,7 +7,8 @@ from api.views import (
     logout,
     UserViewSet,
     RecipeViewSet,
-    TagViewSet
+    TagViewSet,
+    redirect_short_link
 )
 
 router_v1 = DefaultRouter()
@@ -22,6 +23,7 @@ auth_patterns = [
 ]
 
 urlpatterns = [
+    path('s/<str:short_id>/', redirect_short_link, name='recipe-short-url'),
     path('auth/token/', include(auth_patterns)),
     path('', include(router_v1.urls)),
 ]
