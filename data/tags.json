@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Завтрак",
+        "slug": "breakfast"
+    },
+    {
+        "name": "Обед",
+        "slug": "lunch"
+    },
+    {
+        "name": "Ужин",
+        "slug": "dinner"
+    },
+    {
+        "name": "Закуски",
+        "slug": "snacks"
+    },
+    {
+        "name": "Горячее",
+        "slug": "hot-dishes"
+    },
+    {
+        "name": "Десерты",
+        "slug": "desserts"
+    },
+    {
+        "name": "Салаты",
+        "slug": "salads"
+    },
+    {
+        "name": "Напитки",
+        "slug": "drinks"
+    },
+    {
+        "name": "Постное",
+        "slug": "vegetarian"
+    },
+    {
+        "name": "Праздничное",
+        "slug": "festive"
+    }
+]

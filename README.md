@@ -102,20 +102,43 @@ python3 backend/manage.py runserver
 ```
 Для повторного запуска ```frontend``` сервера необходимо повторить пункт №6
 
+## Заполнение .db
+### Создание суперпользователя
+Кроме стандартного способа создания суперпользователя(админа) в проекте есть 
+возможность создать суперпользователя с помощью команды  
 
-### Как заполнить db ингридиентами из .CSV или .JSON файла
+### Как заполнить .db ингридиентами из .CSV или .JSON файла
 В проекте реализована возможность добавления ингридиентов в базу данных 
 без дублирования ингридиентов.
 Команды для добавления:
 ```bash
-python manage.py load_ingredients path_to_file/ingredients.csv
+python3 backend/manage.py load_ingredients path_to_file/ingredients.csv
 ```
 
 ```bash
-python manage.py load_ingredients path_to_file/ingredients.json
+python3 backend/manage.py load_ingredients path_to_file/ingredients.json
 ```
--  ```path_to_file``` путь к директории с файлами для заполнения db формате
-```.csv``` и ```.json```
+-  ```path_to_file``` путь к директории с файлами для заполнения ```.db``` 
+формате ```.csv``` и ```.json```.
+
+В директории ```data/``` есть образцы файлов ```ingredients.csv``` и 
+```ingredients.json```.
+
+### Как заполнить .db тегами из .CSV или .JSON файла
+В проекте реализована возможность добавления тегов в базу данных 
+без дублирования тегов.
+Команды для добавления:
+```bash
+python3 backend/manage.py load_tags path_to_file/tags.csv
+```
+
+```bash
+python3 backend/manage.py load_tags path_to_file/tags.json
+```
+-  ```path_to_file``` путь к директории с файлами для заполнения ```.db```
+формате ```.csv``` и ```.json```.
+
+В директории ```data/``` есть образцы файлов ```tags.csv``` и ```tags.json```.
 
 # Просмотр спецификации API и frontend веб-приложения
 Находясь в папке infra, выполните команду docker-compose up. При выполнении 
