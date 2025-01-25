@@ -36,7 +36,7 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
             'first_name', 'last_name', 'username', 'email', 'password'
         )}),
         ('Разрешения', {'fields': (
-            'is_active', 'is_staff', 'is_superuser',
+            'is_active', 'is_superuser',
         )}),
     )
     add_fieldsets = (
@@ -44,13 +44,14 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
             'classes': ('wide',),
             'fields': (
                 'first_name', 'last_name', 'username', 'email', 'password1',
-                'password2', 'is_superuser', 'is_staff', 'is_active'
+                'password2', 'is_superuser', 'is_active'
             )}
          ),
     )
     filter_horizontal = ('followings', 'cart', 'favorites')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     ordering = ('username', 'email')
+    list_filter = ('is_superuser', 'is_active')
     list_per_page = ITEMS_PER_PAGE
 
     def display_avatar(self, user):
