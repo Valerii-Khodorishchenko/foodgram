@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.apps import AppConfig
 from django.contrib.admin import AdminSite
 
@@ -8,7 +9,7 @@ class RecipeConfig(AppConfig):
     verbose_name = 'Рецепты'
 
 
-class CustomAdminSite(AdminSite):
+class AdminSite(AdminSite):
     site_header = 'Управление приложением FOODGRAM'
     site_title = 'FOODGRAM'
     index_title = 'Администрирование'
@@ -25,4 +26,4 @@ class CustomAdminSite(AdminSite):
         return app_list
 
 
-custom_admin_site = CustomAdminSite()
+admin.site = AdminSite()

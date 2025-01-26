@@ -8,8 +8,9 @@ from api.views import (
     UserViewSet,
     RecipeViewSet,
     TagViewSet,
-    redirect_short_link
 )
+
+app_name = 'api'
 
 router_v1 = DefaultRouter()
 router_v1.register('users', UserViewSet, basename='users')
@@ -23,7 +24,6 @@ auth_patterns = [
 ]
 
 urlpatterns = [
-    path('s/<str:short_id>/', redirect_short_link, name='recipe-short-url'),
     path('auth/token/', include(auth_patterns)),
     path('', include(router_v1.urls)),
 ]

@@ -1,7 +1,4 @@
-from django.shortcuts import redirect
-from django.http import Http404
 from django.urls import reverse
-from hashids import Hashids
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -160,16 +157,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def redirect_short_link(request, short_id):
-    hashids = Hashids(min_length=6)
-    try:
-        recipe_id = hashids.decode(short_id)[0]
-        recipe = Recipe.objects.get(id=recipe_id)
-        return redirect('recipe-detail', pk=recipe.id)
-    except (IndexError, Recipe.DoesNotExist):
-        raise Http404("Рецепт не найден")
-
-
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = LimitOffsetPagination
@@ -181,21 +168,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk):
-        try:
-            recipe = self.get_object()
-            hashids = Hashids(min_length=6)
-            short_id = hashids.encode(recipe.id)
-            short_url = request.build_absolute_uri(
-                reverse('recipe-short-url', kwargs={'short_id': short_id}))
-            return Response(
-                {'short-link': short_url},
-                status=status.HTTP_200_OK
-            )
-        except Recipe.DoesNotExist:
-            return Response(
-                {'detail': 'Рецепт не найден.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        get_object_or_404(Recipe, pk=pk)
+        short_url = request.build_absolute_uri(
+            reverse('recipe-short-url', args=[pk])
+        )
+        return Response({'short-link': short_url}, status=status.HTTP_200_OK)
 
     @action(
         detail=True, methods=('post', 'delete'), url_path='favorite',

@@ -1,18 +1,15 @@
+from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
-from api.views import RecipeViewSet
-from recipe.apps import custom_admin_site
-
+from recipe.views import redirect_short_link
 
 urlpatterns = [
-    path('admin/', custom_admin_site.urls),
+    path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
-    path(
-        'recipes/<int:pk>/', RecipeViewSet.as_view({'get': 'retrieve'}),
-        name='recipe-detail'
-    ),
+    path('recipes/', include('recipe.urls')),
+    path('s/<str:short_id>/', redirect_short_link, name='recipe-short-url')
 ]
 
 if settings.DEBUG:
