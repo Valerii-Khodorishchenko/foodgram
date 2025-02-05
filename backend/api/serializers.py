@@ -130,6 +130,14 @@ class AvatarSerializer(serializers.ModelSerializer):
     def validate_avatar(self, avatar):
         return validate_image_size(avatar)
 
+    def update(self, instance, validated_data):
+        avatar = validated_data.pop('avatar', None)
+        if instance.avatar:
+            instance.avatar.delete(save=False)
+        instance.avatar = avatar
+        instance.save()
+        return instance
+
 
 class PasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
@@ -281,6 +289,10 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         validated_data.pop('author', None)
         ingredients_data = validated_data.pop('components', None)
         tags_data = validated_data.pop('tags', None)
+        image = validated_data.pop('image', None)
+        if image is not None and image != instance.image:
+            instance.image.delete(save=False)
+            instance.image = image
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if tags_data is not None:

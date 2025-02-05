@@ -32,6 +32,25 @@ class DisplayImageMixin:
             return 'Неверный путь к файлу'
         return 'Отсутствует'
 
+    def save_model(self, request, obj, form, change, field_name='image'):
+        if change:
+            old_instance = self.model.objects.get(pk=obj.pk)
+            if (
+                old_file := getattr(old_instance, field_name, None)
+                != getattr(obj, field_name, None)
+            ):
+                old_file.delete(save=False)
+        obj.save()
+
+    def delete_model(self, request, obj, field_name='image'):
+        if obj_file := getattr(obj, field_name, None):
+            obj_file.delete(save=False)
+        obj.delete()
+
+    def delete_queryset(self, request, queryset, field_name='image'):
+        for obj in queryset:
+            self.delete_model(request, obj, field_name=field_name)
+
     display_image.short_description = 'Изображение'
 
 

@@ -74,6 +74,15 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
     def get_cart_count(self, user):
         return user.cart_count
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change, field_name='avatar')
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj, field_name='avatar')
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset, field_name='avatar')
+
     get_followers_count.admin_order_field = 'followers_count'
     get_favorites_count.admin_order_field = 'favorites_count'
     get_cart_count.admin_order_field = 'cart_count'
