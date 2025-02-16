@@ -1,72 +1,50 @@
-from django import forms
 from django.contrib import admin
-from django.utils.html import format_html
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
-from recipe.admin.mixins import (
-    DisplayImageMixin, ImagePreviewMixin, RecipesAdminMixin)
+from recipe.admin.filters import CookingTimeFilter
+from recipe.admin.mixins import DisplayImageMixin, RecipesAdminMixin
 from recipe.constants import ITEMS_PER_PAGE
-from recipe.models import Recipe, RecipeComponent
-from recipe.validators import validate_image_size
+from recipe.models import RecipeComponent
 
 
 class BaseAdmin(admin.ModelAdmin):
     list_per_page = ITEMS_PER_PAGE
 
 
-class RecipeAdminForm(ImagePreviewMixin, forms.ModelForm):
-    class Meta:
-        model = Recipe
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_image_preview('image', self.instance)
-
-    def clean_image(self):
-        image = self.cleaned_data.get('image')
-        validate_image_size(image)
-        return image
-
-
 class RecipeAdmin(DisplayImageMixin, BaseAdmin):
-    form = RecipeAdminForm
     fields = (
-        'name', 'get_favorites_count', 'author', 'tags', 'cooking_time',
+        'name', 'author', 'tags', 'cooking_time',
         'text', 'image'
     )
     list_display = (
-        'name', 'display_image', 'tag_list', 'author', 'cooking_time', 'text',
+        'name', 'display_image', 'tag_list', 'author', 'cooking_time',
         'ingredient_list', 'get_favorites_count'
     )
-    readonly_fields = ('get_favorites_count',)
-    list_filter = ('tags', 'author')
-    search_fields = ('author__username', 'name', 'text', 'tags__name')
+    list_filter = ('tags', 'author', CookingTimeFilter)
+    search_fields = ('author__username', 'name', 'tags__name')
     filter_horizontal = ('tags', 'ingredients')
     ordering = ('name',)
 
+    @admin.display(description='Теги')
+    @mark_safe
     def tag_list(self, recipe):
-        return format_html(
-            '<br> '.join(
-                [
-                    f'<a href="/admin/recipe/tag/{tag.id}/">#{tag.name}</a>'
-                    for tag in recipe.tags.all()
-                ]))
-
-    def ingredient_list(self, recipe):
-        ingredients = recipe.components.all()
-        return format_html('<br> '.join(
-            f'{ingredient.ingredient.name} - {ingredient.amount}'
-            f'{ingredient.ingredient.measurement_unit}'
-            for ingredient in ingredients
+        return ('<br> '.join(
+            '<a href="{0}">#{1}</a>'.format(
+                reverse('admin:recipe_tag_change', args=[tag.id]),
+                tag.name
+            )
+            for tag in recipe.tags.all()
         ))
 
-    def get_fields(self, request, obj=None):
-        fields = super().get_fields(request, obj)
-        if not obj:
-            return [
-                field for field in fields if field != 'get_favorites_count'
-            ]
-        return fields
+    @admin.display(description='Ингредиенты')
+    @mark_safe
+    def ingredient_list(self, recipe):
+        return ('<br> '.join(
+            f'{ingredient.ingredient.name} - {ingredient.amount}'
+            f'{ingredient.ingredient.measurement_unit}'
+            for ingredient in recipe.components.all()
+        ))
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -74,15 +52,28 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
             'tags', 'components__ingredient'
         )
 
+    @admin.display(description='Понравилось')
     def get_favorites_count(self, recipe):
         return recipe.favorites.count()
 
-    get_favorites_count.short_description = 'Понравилось пользователям'
-    tag_list.short_description = 'Теги'
-    ingredient_list.short_description = 'Ингредиенты'
+    # def formfield_for_dbfield(self, db_field, **kwargs):
+    #     from recipe.admin.mixins import get_img
+    #     from recipe.models import Recipe
+    #     from recipe.constants import DISPLAY_IMAGE_SIZE
+    #     field = super().formfield_for_dbfield(db_field, **kwargs)
+    #     instance = kwargs.get('instance')
+    #     print(instance)
+    #     if db_field.name == 'image':
+    #         request  = kwargs.get('request')
+    #         object_id = request.resolver_match.kwargs.get('object_id')
+    #         if recipe := Recipe.objects.filter(id=object_id).first():
+    #             image_url = recipe.image.url
+    #             field.help_text = get_img(image_url, DISPLAY_IMAGE_SIZE)
+    #     return field
 
 
 class RecipeIngredientInline(admin.TabularInline):
+    # TODO: Вернуться после исправления моделей (убрать лишний класс)
     model = RecipeComponent
     extra = 1
     fields = ('ingredient', 'amount', 'measurement_unit')
@@ -92,10 +83,9 @@ class RecipeIngredientInline(admin.TabularInline):
         qs = super().get_queryset(request)
         return qs.select_related('ingredient', 'recipe')
 
+    @admin.display(description='Единица измерения')
     def measurement_unit(self, ingredient):
         return ingredient.ingredient.measurement_unit
-
-    measurement_unit.short_description = 'Единица измерения'
 
 
 class TagAdmin(RecipesAdminMixin, BaseAdmin):
@@ -108,4 +98,5 @@ class IngredientAdmin(RecipesAdminMixin, BaseAdmin):
         'name', 'measurement_unit',
         *RecipesAdminMixin.list_display
     )
-    search_fields = ('name',)
+    search_fields = ('name', 'measurement_unit')
+    list_filter = ('measurement_unit',)

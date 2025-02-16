@@ -1,0 +1,1 @@
+TYPE_FILE_SHOPPING_LIST = 'pdf'

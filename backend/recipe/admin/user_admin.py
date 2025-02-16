@@ -1,33 +1,17 @@
+from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserChangeForm
 from django.db.models import Count
 
-from recipe.admin.mixins import DisplayImageMixin, ImagePreviewMixin
+from recipe.admin.filters import (
+    HasFollowersFilter, HasRecipesFilter, HasSubscriptionsFilter)
+from recipe.admin.mixins import DisplayImageMixin
 from recipe.constants import ITEMS_PER_PAGE
-from recipe.models import User
-from recipe.validators import validate_image_size
 
 
-class UserForm(ImagePreviewMixin, UserChangeForm):
-    class Meta:
-        model = User
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['avatar'].required = False
-        self.add_image_preview('avatar', self.instance)
-
-    def clean_avatar(self):
-        avatar = self.cleaned_data.get('avatar')
-        validate_image_size(avatar)
-        return avatar
-
-
-class CustomUserAdmin(DisplayImageMixin, UserAdmin):
-    form = UserForm
+class UserAdmin(DisplayImageMixin, UserAdmin):
     list_display = (
-        'username', 'display_avatar', 'email', 'first_name', 'last_name',
+        'username', 'display_avatar', 'email', 'get_full_name',
         'get_followers_count', 'get_favorites_count', 'get_cart_count'
     )
     fieldsets = (
@@ -49,13 +33,20 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
          ),
     )
     filter_horizontal = ('followings', 'cart', 'favorites')
-    search_fields = ('username', 'email', 'first_name', 'last_name')
+    search_fields = ('username', 'email', 'get_full_name')
     ordering = ('username', 'email')
-    list_filter = ('is_superuser', 'is_active')
+    list_filter = (
+        'is_superuser', 'is_active',
+        HasRecipesFilter, HasFollowersFilter, HasSubscriptionsFilter
+    )
     list_per_page = ITEMS_PER_PAGE
 
+    @admin.display(description='Аватарка')
     def display_avatar(self, user):
         return self.display_image(user, 'avatar')
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        return super().formfield_for_dbfield(db_field, model=get_user_model(), field_name='avatar', **kwargs)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -65,12 +56,19 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
             cart_count=Count('cart'),
         )
 
+    @admin.display(description='Полное имя')
+    def get_full_name(self, user):
+        return f'{user.last_name} {user.first_name}'
+
+    @admin.display(description='Подписчики')
     def get_followers_count(self, user):
         return user.followers_count
 
+    @admin.display(description='Понравилось')
     def get_favorites_count(self, user):
         return user.favorites_count
 
+    @admin.display(description='Корзина')
     def get_cart_count(self, user):
         return user.cart_count
 
@@ -82,11 +80,3 @@ class CustomUserAdmin(DisplayImageMixin, UserAdmin):
 
     def delete_queryset(self, request, queryset):
         super().delete_queryset(request, queryset, field_name='avatar')
-
-    get_followers_count.admin_order_field = 'followers_count'
-    get_favorites_count.admin_order_field = 'favorites_count'
-    get_cart_count.admin_order_field = 'cart_count'
-    display_avatar.short_description = 'Аватарка'
-    get_followers_count.short_description = 'Подписчики'
-    get_favorites_count.short_description = 'Понравилось'
-    get_cart_count.short_description = 'Корзина'

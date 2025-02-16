@@ -9,8 +9,9 @@ from recipe.constants import MAX_SIZE_IMG
 def validate_username(username):
     if invalid_chars := re.sub(r'[\w.@+-]', '', username):
         raise ValidationError(
-            'Имя пользователя содержит недопустимые символы:'
-            f' {" ".join(set(invalid_chars))}.'
+            'Имя пользователя содержит недопустимые символы: {}.'.format(
+                ' '.join(set(invalid_chars))
+            )
         )
     return username
 
