@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  backend:
+    container_name: foodgram-back
+    env_file: ../.env
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ../backend:/app
+      - static:/app/collected_static
+  frontend:
+    container_name: foodgram-front
+    build: ../frontend
+    volumes:
+      - ../frontend/:/app/result_build/
+  nginx:
+    container_name: foodgram-proxy
+    image: nginx:1.25.4-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../frontend/build:/usr/share/nginx/html/
+      - ../backend/docs/:/usr/share/nginx/html/api/docs/
+      - static:/static
+      - ../backend/media:/media
+volumes:
+  static:
+  

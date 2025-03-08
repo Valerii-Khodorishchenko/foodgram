@@ -1,46 +1,85 @@
-# Запуск backend, frontend серверов в режиме CORS.
+# [Foodgram](https://fastfoodgram.sytes.net/)
 
-Пример всех команд приведён в ***bash sell***.
+[![Django](https://img.shields.io/badge/Django-3.2.3-092E20?logo=django&logoColor=white)](https://docs.djangoproject.com/en/3.2/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![Docker](https://img.shields.io/badge/Docker_compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![CI/CD](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=github-actions&logoColor=white)](https://docs.github.com/en/actions)
+[![Django REST Framework](https://img.shields.io/badge/DRF-3.12.4-ff1709?logo=django&logoColor=white)](https://www.django-rest-framework.org/)
+[![Djoser](https://img.shields.io/badge/Djoser-2.0.0-FCA121?logo=django&logoColor=white)](https://djoser.readthedocs.io/)
+[![Flake8](https://img.shields.io/badge/Flake8-6.0.0-3776AB?logo=python&logoColor=white)](https://flake8.pycqa.org/)
+[![Gunicorn](https://img.shields.io/badge/Gunicorn-20.1.0-499848?logo=gunicorn&logoColor=white)](https://docs.gunicorn.org/)
+[![Nginx](https://img.shields.io/badge/Nginx-1.25.4-009639?logo=nginx&logoColor=white)](https://nginx.org/)
 
-1. Форкнуть репозиторий.
-2. Клонировать репозиторий любым удобным способом, например:
+**Foodgram** — это веб-сервис для публикации и обмена рецептами. Пользователи могут добавлять рецепты в избранное, подписываться на других авторов, а также формировать удобный список покупок на основе выбранных блюд.
+
+- [Описание](#foodgram)
+- [Основные технологии](#основные-технологии)
+- [Основной функционал](#основной-функционал)
+- [Установка](#установка)
+  - [Как заполнить .env](#как-заполнить-env) 
+  - [Структура проекта](#структура-проекта)
+- [Запуск локально в режиме CORS](#запуск-локально-в-режиме-cors) (для разработки и тестирования)
+  - [Запуск backend сервера Django](#запуск-backend-сервера-django)
+  - [Запуск frontend сервера React](#запуск-frontend-сервера-react)
+  - [Остановка, повторный запуск](#приложение-запущено)
+- [Запуск локально Docker Compose с общими томами]() (для разработки)
+- [API Документация]() 
+- [Заполнение .db](#заполнение-db)
+  - [Создание суперпользователя](#создание-суперпользователя)
+  - [Заполнение .db ингридиентами из .CSV или .JSON файла](#заполнение-db-ингридиентами-из-csv-или-json-файла)
+  - [Заполнение .db тегами из .CSV или .JSON файла](#заполнение-db-тегами-из-csv-или-json-файла)
+  - [Загрузка фикстур](#загрузка-фикстур)
+- [Запуск тестов]()
+- [Запуск локально Docker Compose]() (для проверки перед деплоем)
+- [Деплой Docker-Compos]() 
+- [Настройка CI/CD через Action GitHub]
+
+## Основные технологии
+- **Бэкенд:** Django + Django REST Framework
+- **Фронтенд:** React *(написан не мной)
+- **База данных:** PostgreSQL
+- **Контейнеризация:** Docker, Docker Compose  
+- **CI/CD:** GitHub Actions (линтинг, деплой)
+- <details>
+  <summary>Еще технологии</summary>
+    <br>
+
+    - Оптимизация: django-debug-toolbar 3.2.3 для анализа и
+    оптимизации запросов 
+    - Работа с изображениями: Pillow 9.0.0
+    - Корс: django-cors-headers 3.7.0 для поддержки CORS
+    - Фильтрация: django-filter 2.4.0
+    - Документация: ReportLab 4.2.5 для генерации PDF
+    - Постоянное хранение: PostgreSQL через psycopg2-binary 2.9.3
+    - Производительность: numpy 1.23.5 для обработки данных
+    - **Gunicorn** — WSGI HTTP сервер, использованный для запуска бэкенда Django в продакшн-среде.
+    - Запуск: Gunicorn 20.1.0 для продакшн-сервера
+    - Код-стайл: Flake8 6.0.0 для линтинга кода
+    - Конфигурации: python-dotenv 1.0.1 для работы с переменными окружения
+    - Проксирование: Nginx для проксирования запросов и управления статическими файлами
+
+</details>
+
+## Основной функционал
+- Регистрация и аутентификация пользователей
+- Публикация и редактирование рецептов
+- Сохранение рецептов в избранное
+- Формирование списка покупок
+- Подписка на других пользователей
+
+## Установка
+>Пример всех команд приведён в ***bash sell***.
+
+<p>Клонируйте репозиторий любым удобным способом, например</p>
+
 ```bash
-git clone https://github.com/yourusername/foodgram.git
-# yourusername - имя вашего аккаунта на GitHub
+git clone https://github.com/Valerii-Khodorishchenko/foodgram.git
 ```
-3. Перейти в директорию с клонированым репозиторием.
+Перейти в директорию с клонированым репозиторием.
 ```bash
 cd foodgram
 ```
-4. Создать любым удобным для вас способом, а затем заполнить ```.env``` :
-### Как заполнить ```.env``` :
-```nano
-SECRET_KEY='your-secret-key'
-DEBUG=True
-ALLOWED_HOSTS=localhost 127.0.0.1 domain.name
-
-USE_POSTGRES_DB=True
-POSTGRES_DB=foodgram
-POSTGRES_USER=user
-POSTGRES_PASSWORD=password
-DB_NAME=foodgram
-DB_HOST=db
-DB_PORT=5432
-```
-- `SECRET_KEY` — секретный ключ для Django.
-- `DEBUG` — указывает, включен ли режим отладки.
-- `ALLOWED_HOSTS` — список разрешенных хостов.
-- `USE_POSTGRES_DB` — использовать PostgreSQL или оставить SQLite.
-- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — параметры для
-подключения к PostgreSQL.
-- `DB_HOST`, `DB_PORT` — хост и порт базы данных.
-
-Создать и открыть для заполнения .env можно командой:
-```bash
-nano .env
-```
-### 5. Запуск backend сервера:
- - Cоздать и активировать виртуальное окружение.
+Cоздать и активировать виртуальное окружение.<br>
 Для Linux:
 ```bash
 python3 -m venv venv
@@ -51,46 +90,156 @@ source venv/bin/activate
 py -3.9 -m venv venv
 source venv/Scripts/activate
 ```
-Далее все команды будут представлены для Linux, чтобы они работали в Windows, 
-необходимо ```python3``` заменить на ```py```.
-- Обновить пакетный менеджер ```pip```.
+>Далее все команды будут представлены для Linux, чтобы они работали в Windows, 
+необходимо ```python3``` заменить на ```py```.<br>
+
+Обновить пакетный менеджер ```pip```.
 ```bash
 python3 -m pip install --upgrade pip
 ```
-- Установить зависимости.
+Установить зависимости.
 ```bash
 pip install -r backend/requirements.txt
 ```
-- Выполнить миграции.
+Создать любым удобным для вас способом, а затем заполнить ```.env``` :
+## Как заполнить .env
+```bash
+# Настройки Django
+SECRET_KEY='your-secret-key'
+DEBUG=True
+ALLOWED_HOSTS=localhost 127.0.0.1 domain.name
+
+# Настройки PostgreSQL
+USE_POSTGRES_DB=True  # Если False, блок можно полностью пропустить
+POSTGRES_DB=foodgram
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+DB_NAME=foodgram
+DB_HOST=db
+DB_PORT=5432
+
+# Для создания администратора (необязательный блок)
+USERNAME='admin'  # Должн быть уникальным
+FIRST_NAME='admin'
+LAST_NAME='admin'
+EMAIL='admin@gmail.com'  # Должн быть уникальным
+PASSWORD='admin_password'
+```
+- `SECRET_KEY` — секретный ключ для Django. 
+<br>Можно сгенерировать:
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+- `DEBUG` — указывает, включен ли режим отладки `True`.
+- `ALLOWED_HOSTS` — список разрешенных хостов (обязательно отделённых друг от друга пробелом). 
+- `USE_POSTGRES_DB` — использовать PostgreSQL `True` или оставить SQLite `False`.
+- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` — параметры для
+подключения к PostgreSQL.
+- `DB_HOST`, `DB_PORT` — хост и порт базы данных.
+
+Создать и открыть для заполнения .env можно командой:
+```bash
+nano .env
+```
+
+## Структура проекта
+```bash
+├── backend  # Django + Django REST Framework бэкенд
+│   ├── api/
+│   ├── backend/
+│   ├── recipe/
+│   │   ├── __init__.py
+│   │   ├── admin/
+│   │   │   ├── __init__.py
+│   │   │   ├── filters.py
+│   │   │   ├── mixins.py
+│   │   │   ├── recipe_admin.py
+│   │   │   └── user_admin.py
+│   │   ├── apps.py
+│   │   ├── constants.py
+│   │   ├── management/
+│   │   │   ├── base_import.py
+│   │   │   └── commands
+│   │   │       ├── load_ingredients.py
+│   │   │       └── load_tags.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   ├── validators.py
+│   │   └── views.py
+│   ├── Dockerfile
+│   ├── Dockerfile.bak
+│   ├── entrypoint.sh
+│   ├── entrypoint.sh.bak
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── static/fonts/ arial.ttf
+├── data  # Данные для .db
+│   ├── ingredients.csv  # Ингредиенты
+│   ├── ingredients.json
+│   ├── fixtures_db.json  # Фикстуры
+│   ├── superuser.sh  # Скрипт создания Администратора
+│   ├── tags.csv  # Теги 
+│   └── tags.json
+├── docs/  # Документация
+├── frontend/  # React - фронтенд 
+├── gateway
+│   ├── Dockerfile
+│   └── nginx.conf
+├── infra
+│   ├── docker-compose.yml
+│   ├── docker-compose.yml.bak
+│   └── nginx.conf
+├── postman_collection  # Postman тесты
+│   ├── README.md
+│   ├── clear_db.sh  # Скрипт очистки .db от тестовых случаев
+│   └── foodgram.postman_collection.json  # Postman коллекция 
+├── venv/  # виртуальное окружение
+├── .env  # файл переменных окружения
+├── .gitignore
+├── docker-compose.production.yml
+├── docker-compose.yml
+├── README.md
+└── setup.cfg
+```
+## Запуск локально в режиме CORS.
+### Запуск backend сервера Django:
+Создать миграции.
+```bash
+python3 backend/manage.py makemigrations recipe
+```
+Выполнить миграции.
 ```bash
 python3 backend/manage.py migrate
 ```
-- Запустить сервер.
+Запустить `backend` сервер.
 ```bash
 python3 backend/manage.py runserver
 ```
+### Запуск frontend сервера React:
 
-### 6. Запуск frontend сервера:
-
-- Перейти в директорию ```frontend/```.
-``` bash
+Перейти в директорию `frontend/`.
+```bash
 cd frontend
 ```
-- Запустить ```frontend``` сервер.
+Установить зависимости
+```bash
+npm install
+```
+Запустить `frontend` сервер.
 ```bash
 npm run start
 ```
 ### Приложение запущено.
 Далее приложение самостоятельно откроется в браузере по адресу 
-http://localhost:3000/recipes в режиме ```frontend + backend```
+http://localhost:3000/recipes в режиме `frontend + backend`
 
-Отдельно для просмотра ```backend``` сервера доступны адреса:
+Отдельно для просмотра `backend`-сервера доступны адреса:
 - админ панель http://localhost:8000/admin/
 - api http://localhost:8000/api/
 
-Для остановки ```backend``` сервера используйте сочетание клавиш ```CTRL+C```
+Для остановки `backend`-сервера используйте сочетание клавиш `CTRL+C`
 
-Для остановки ```frontend``` сервера используйте сочетание клавиш ```CTRL+C```
+Для остановки `frontend`-сервера используйте сочетание клавиш `CTRL+C`
 
 Для повторного запуска backend необходимо активировать виртуальное окружение и 
 запустить сервер командами:
@@ -100,14 +249,22 @@ source venv/bin/activate
 ```bash
 python3 backend/manage.py runserver
 ```
-Для повторного запуска ```frontend``` сервера необходимо повторить пункт №6
+Для повторного запуска `frontend`-сервера необходимо 
+- Перейти в директорию `frontend/`
+- Запустить `frontend`-сервер.
+```bash
+npm run start
+```
 
 ## Заполнение .db
 ### Создание суперпользователя
 Кроме стандартного способа создания суперпользователя(админа) в проекте есть 
-возможность создать суперпользователя с помощью команды  
+возможность создать суперпользователя с помощью команды
+```bash
+bash superuser.sh
+```
 
-### Как заполнить .db ингридиентами из .CSV или .JSON файла
+### Заполнение .db ингридиентами из .CSV или .JSON файла
 В проекте реализована возможность добавления ингридиентов в базу данных 
 без дублирования ингридиентов.
 Команды для добавления:
@@ -124,7 +281,7 @@ python3 backend/manage.py load_ingredients path_to_file/ingredients.json
 В директории ```data/``` есть образцы файлов ```ingredients.csv``` и 
 ```ingredients.json```.
 
-### Как заполнить .db тегами из .CSV или .JSON файла
+### Заполнение .db тегами из .CSV или .JSON файла
 В проекте реализована возможность добавления тегов в базу данных 
 без дублирования тегов.
 Команды для добавления:
@@ -139,12 +296,31 @@ python3 backend/manage.py load_tags path_to_file/tags.json
 формате ```.csv``` и ```.json```.
 
 В директории ```data/``` есть образцы файлов ```tags.csv``` и ```tags.json```.
-
-# Просмотр спецификации API и frontend веб-приложения
+### Загрузка/выгрузка фикстур
+Загрузка фикстур
+```bash
+python3 backend/manage.py loaddata data/fixtures_db.json
+```
+Выгрузка фикстур
+Для Linux:
+```bash
+python3 backend/manage.py dumpdata --indent 2 -o data/fixtures_db.json
+```
+Для Windows:
+```bash
+py -Xutf8 backend/manage.py dumpdata --indent 2 -o data/fixtures_db.json
+```
+## Запуск локально Docker Compose с общими томами
+<!-- # Просмотр спецификации API и frontend веб-приложения
 Находясь в папке infra, выполните команду docker-compose up. При выполнении 
 этой команды контейнер frontend, описанный в docker-compose.yml, подготовит 
 файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою 
 работу.
 
 По адресу http://localhost изучите фронтенд веб-приложения, а по адресу 
-http://localhost/api/docs/ — спецификацию API.
+http://localhost/api/docs/ — спецификацию API. -->
+
+## Doker-compose
+```bash
+ docker compose -f docker-compose.pre-production.yml up --build
+```

@@ -4,6 +4,7 @@ volumes:
   db_data:
   static:
   media:
+  docs:
 
 services:
   db:
@@ -21,6 +22,7 @@ services:
     volumes:
       - static:/backend_static
       - media:/app/media/
+      - docs:/app/docs/
   frontend:
     image: valera1991/foodgram_frontend
     container_name: foodgram_frontend
@@ -37,5 +39,6 @@ services:
       - backend
       - frontend
     volumes:
-      - static:/staticfiles/
-      - media:/app/media
+      - static:/foodgram_static/
+      - media:/foodgram_media/
+      - docs:/foodgram_docs/api/docs/
