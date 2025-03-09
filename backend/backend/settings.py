@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS += [
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
     'debug_toolbar',
     'django_filters',
 ]
@@ -113,22 +114,49 @@ STATIC_URL = '/backend_static/'
 
 STATICFILES_DIRS = (BASE_DIR / 'static',)
 STATIC_ROOT = BASE_DIR / 'collected_static'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ],
+    ),
+    'EXCEPTION_HANDLER': 'api.exceptions.not_found',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
 
 AUTH_USER_MODEL = 'recipe.User'
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'PERMISSIONS': {
+        'activation': ('api.permissions.DenyAccessPermission',),
+        'password_reset': ('api.permissions.DenyAccessPermission',),
+        'password_reset_confirm': ('api.permissions.DenyAccessPermission',),
+        'username_reset': ('api.permissions.DenyAccessPermission',),
+        'username_reset_confirm': ('api.permissions.DenyAccessPermission',),
+        'set_username': ('api.permissions.DenyAccessPermission',),
+        'user': ('rest_framework.permissions.AllowAny',),
+        'user_list': ('rest_framework.permissions.AllowAny',),
+    },
+    'SERIALIZERS': {
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.UserCreateSerializer',
+    },
+    'HIDE_USERS': False
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'recipe.validators.MaximumLengthValidator',
+        'OPTIONS': {'max_length': 128},
+    },
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

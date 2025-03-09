@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.exceptions import NotFound
 
 
 class IsAuthorOrAdmin(BasePermission):
@@ -8,3 +9,8 @@ class IsAuthorOrAdmin(BasePermission):
             or request.user.is_superuser
             or obj.author == request.user
         )
+
+
+class DenyAccessPermission(BasePermission):
+    def has_permission(self, request, view):
+        raise NotFound('Страница не найдена.')

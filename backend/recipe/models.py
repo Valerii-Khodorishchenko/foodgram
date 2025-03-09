@@ -42,10 +42,6 @@ class User(AbstractUser):
         help_text='Загрузите изображение для аватарки.',
         null=True, default=None,
     )
-    followings = models.ManyToManyField(
-        'self', verbose_name='Подписки', related_name='followers',
-        symmetrical=False
-    )
     favorites = models.ManyToManyField(
         'Recipe', verbose_name='Избранные рецепты', related_name='favorites'
     )
@@ -63,6 +59,31 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username[:DESCRIPTION_LENGTH]
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='followers',
+        on_delete=models.CASCADE
+    )
+    following = models.ForeignKey(
+        User,
+        related_name='following',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ('following',)
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'following'),
+                name='unique_user_following'
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.following}'
 
 
 class Ingredient(models.Model):

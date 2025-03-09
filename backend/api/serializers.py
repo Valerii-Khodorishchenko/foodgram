@@ -1,57 +1,76 @@
-import base64
 
-from django.contrib.auth.password_validation import validate_password
-from django.core.files.base import ContentFile
+from djoser.serializers import (
+    UserSerializer as DjoserUserSerializer,
+    UserCreateSerializer as DjoserUserCreateSerializer
+)
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipe.constants import MAX_PASSWORD_LENGTH
-from recipe.models import Ingredient, Recipe, RecipeComponent, Tag, User
+
+from recipe.models import (
+    Follow,
+    Ingredient,
+    Recipe,
+    RecipeComponent,
+    Tag,
+    User
+)
 from recipe.validators import (
-    validate_current_password,
     validate_favorite_or_cart,
-    validate_image_size,
+    validate_image,
     validate_ingredients,
-    validate_new_password,
     validate_required_fields,
     validate_subscribe,
     validate_tags,
-    validate_user_credentials
 )
 
 
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(
-                base64.b64decode(imgstr), name='temp.' + ext
-            )
-        return super().to_internal_value(data)
+class UserCreateSerializer(DjoserUserCreateSerializer):
+    class Meta(DjoserUserCreateSerializer.Meta):
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name', 'password')
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(DjoserUserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta:
-        model = User
-        fields: tuple[str, ...] = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'avatar'
-        )
+    class Meta(DjoserUserSerializer.Meta):
+        fields = (
+            *UserCreateSerializer.Meta.fields[:-1], 'is_subscribed', 'avatar')
+        read_only_fields = ('is_subscribed', 'avatar')
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, target_user):
         if (
             (request := self.context.get('request'))
             and request.user.is_authenticated
         ):
-            return obj.followings.filter(id=request.user.id).exists()
+            return Follow.objects.filter(
+                user=request.user, following=target_user).exists()
         return False
+
+
+class AvatarSerializer(serializers.ModelSerializer):
+    avatar = Base64ImageField(
+        required=True,
+        error_messages={
+            'required': 'Обязательное поле.',
+        }
+    )
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+    def validate_avatar(self, avatar):
+        return validate_image(avatar)
+
+    def update(self, instance, validated_data):
+        avatar = validated_data.pop('avatar', None)
+        if instance.avatar:
+            instance.avatar.delete(save=False)
+        instance.avatar = avatar
+        instance.save()
+        return instance
 
 
 class SubscribeSerializer(UserSerializer):
@@ -61,8 +80,10 @@ class SubscribeSerializer(UserSerializer):
     recipes = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields[:-1]
-        fields += 'recipes_count', 'recipes', UserSerializer.Meta.fields[-1]
+        fields = (
+            *UserSerializer.Meta.fields[:-1], 'recipes_count', 'recipes',
+            UserSerializer.Meta.fields[-1]
+        )
         read_only_fields = UserSerializer.Meta.fields
 
     def get_recipes(self, obj):
@@ -83,74 +104,10 @@ class SubscribeSerializer(UserSerializer):
         target_user = self.context['target_user']
         method = self.context['request'].method
         if method == 'POST':
-            user.followings.add(target_user)
+            Follow.objects.create(user=user, following=target_user)
         elif method == 'DELETE':
-            user.followings.remove(target_user)
+            Follow.objects.filter(user=user, following=target_user).delete()
         return target_user
-
-
-class SignupSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        max_length=MAX_PASSWORD_LENGTH, write_only=True,
-        validators=[validate_password]
-    )
-
-    class Meta:
-        model = User
-        fields = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'password'
-        )
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True, required=True)
-
-    def validate(self, data):
-        return validate_user_credentials(data)
-
-
-class AvatarSerializer(serializers.ModelSerializer):
-    avatar = Base64ImageField(
-        required=True,
-        error_messages={
-            "invalid": "Файл не является корректным изображением.",
-            "required": "Обязательное поле.",
-            "empty": "Вы отправили пустой файл.",
-        },
-    )
-
-    class Meta:
-        model = User
-        fields = ('avatar',)
-
-    def validate_avatar(self, avatar):
-        return validate_image_size(avatar)
-
-    def update(self, instance, validated_data):
-        avatar = validated_data.pop('avatar', None)
-        if instance.avatar:
-            instance.avatar.delete(save=False)
-        instance.avatar = avatar
-        instance.save()
-        return instance
-
-
-class PasswordSerializer(serializers.Serializer):
-    new_password = serializers.CharField(
-        required=True, validators=[validate_password]
-    )
-    current_password = serializers.CharField(required=True)
-
-    def validate_current_password(self, current_password):
-        return validate_current_password(
-            self.context.get('user'), current_password)
-
-    def validate(self, passwords):
-        return validate_new_password(passwords)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -247,7 +204,12 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
-    image = Base64ImageField()
+    image = Base64ImageField(
+        required=True,
+        error_messages={
+            'required': 'Обязательное поле.',
+        }
+    )
     author = serializers.HiddenField(
         default=serializers.CurrentUserDefault()
     )
@@ -257,11 +219,13 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        validate_required_fields(data, ['components', 'tags'])
+        validate_required_fields(
+            data, ('components', 'tags', 'name', 'text', 'cooking_time')
+        )
         return data
 
     def validate_image(self, image):
-        return validate_image_size(image)
+        return validate_image(image)
 
     def validate_ingredients(self, ingredients):
         return validate_ingredients(ingredients)
@@ -286,9 +250,8 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        validated_data.pop('author', None)
-        ingredients_data = validated_data.pop('components', None)
-        tags_data = validated_data.pop('tags', None)
+        ingredients_data = validated_data.pop('components')
+        tags_data = validated_data.pop('tags')
         image = validated_data.pop('image', None)
         if image is not None and image != instance.image:
             instance.image.delete(save=False)

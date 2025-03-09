@@ -2,13 +2,11 @@ from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets, status
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (
-    AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly
 )
@@ -20,68 +18,31 @@ from api.permissions import IsAuthorOrAdmin
 from api.serializers import (
     AvatarSerializer,
     IngredientSerializer,
-    LoginSerializer,
-    PasswordSerializer,
     RecipeCartFavoriteSerializer,
     RecipeCreatePatchSerializer,
-    SignupSerializer,
     SubscribeSerializer,
-    TagSerializer,
-    UserSerializer
+    TagSerializer
 )
 from recipe.models import Ingredient, Recipe, Tag, User
 from recipe.constants import TYPE_FILE_SHOPPING_LIST
 
 
-class LoginView(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        token, created = Token.objects.get_or_create(
-            user=serializer.validated_data
-        )
-        return Response({"auth_token": token.key}, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout(request):
-    request.auth.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserViewSet(DjoserUserViewSet):
     pagination_class = LimitOffsetPagination
     http_method_names = ('get', 'post', 'put', 'delete')
 
-    def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = [AllowAny]
-        return super().get_permissions()
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return SignupSerializer
-        return super().get_serializer_class()
-
     @action(
-        detail=False,
-        methods=('get',),
-        url_path='me',
+        detail=False, methods=['get'], url_path='me',
         permission_classes=(IsAuthenticated,)
     )
-    def user_profile(self, request):
-        return Response(self.get_serializer(request.user).data)
+    def me(self, request, *args, **kwargs):
+        return super().me(request, *args, **kwargs)
 
     @action(
-        detail=False,
-        methods=('put', 'delete'),
-        url_path='me/avatar',
+        detail=False, methods=['put', 'delete'], url_path='me/avatar',
         permission_classes=(IsAuthenticated,),
     )
-    def user_avatar(self, request):
+    def avatar(self, request):
         user = request.user
         if request.method == 'PUT':
             serializers = AvatarSerializer(user, data=request.data)
@@ -92,30 +53,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        detail=False,
-        methods=('post',),
-        url_path='set_password',
-        permission_classes=(IsAuthenticated,),
-    )
-    def set_password(self, request):
-        user = request.user
-        serializer = PasswordSerializer(
-            data=request.data, context={'user': user}
-        )
-        serializer.is_valid(raise_exception=True)
-        user.set_password(serializer.validated_data['new_password'])
-        user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(
-        detail=False,
-        methods=('get',),
-        url_path='subscriptions',
-        permission_classes=(IsAuthenticated,),
+        detail=False, methods=('get',), url_path='subscriptions',
+        permission_classes=(IsAuthenticated,)
     )
     def get_subscriptions(self, request):
         user = request.user
-        subscriptions = user.followings.all()
+        subscriptions = User.objects.filter(following__user=user)
         recipes_limit = request.query_params.get('recipes_limit', None)
         page = self.paginate_queryset(subscriptions)
         if page is not None:
@@ -129,7 +72,6 @@ class UserViewSet(viewsets.ModelViewSet):
             subscriptions, many=True,
             context={'request': request, 'recipes_limit': recipes_limit}
         )
-        return Response(serializer.data)
 
     @action(
         detail=True,
@@ -137,8 +79,8 @@ class UserViewSet(viewsets.ModelViewSet):
         url_path='subscribe',
         permission_classes=(IsAuthenticated,),
     )
-    def subscribe(self, request, pk):
-        target_user = get_object_or_404(User, id=pk)
+    def subscribe(self, request, id):
+        target_user = get_object_or_404(User, id=id)
         recipes_limit = request.query_params.get('recipes_limit', None)
         serializer = SubscribeSerializer(
             target_user,

@@ -1,9 +1,22 @@
 import re
 
-from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
 from recipe.constants import MAX_SIZE_IMG
+
+
+class MaximumLengthValidator:
+    def __init__(self, max_length=128):
+        self.max_length = max_length
+
+    def validate(self, password, user=None):
+        if len(password) > self.max_length:
+            raise ValidationError(self.get_help_text())
+
+    def get_help_text(self):
+        return 'Длина пароля не должна превышать {} символов.'.format(
+            self.max_length
+        )
 
 
 def validate_username(username):
@@ -16,26 +29,10 @@ def validate_username(username):
     return username
 
 
-def validate_current_password(user, current_password):
-    if not user.check_password(current_password):
-        raise ValidationError('Неверный текущий пароль')
-    return current_password
-
-
-def validate_new_password(passwords):
-    if passwords['new_password'] == passwords['current_password']:
-        raise ValidationError({
-            'new_password': 'Новый пароль не может быть таким же, как текущий.'
-        })
-    return passwords
-
-
-def validate_user_credentials(data):
-    if not (user := authenticate(
-        email=data.get('email'), password=data.get('password')
-    )):
-        raise ValidationError({'error': 'Неверный email или пароль'})
-    return user
+def validate_image(image):
+    if image is None:
+        raise ValidationError('Недолжно быть пустым')
+    return validate_image_size(image)
 
 
 def validate_image_size(image):
@@ -50,18 +47,19 @@ def validate_subscribe(data, user, target_user, method):
     if user == target_user:
         raise ValidationError('Нельзя подписаться на себя.')
     if method == 'POST':
-        if user.followings.filter(id=target_user.id).exists():
+        if target_user.following.filter(user=user).exists():
             raise ValidationError('Вы уже подписаны на этого пользователя.')
     elif method == 'DELETE':
-        if not user.followings.filter(id=target_user.id).exists():
+        if not user.followers.filter(following=target_user).exists():
             raise ValidationError('Вы не подписаны на этого пользователя.')
     return data
 
 
 def validate_required_fields(data, fields):
-    for field in fields:
-        if not data.get(field):
-            raise ValidationError({field: 'Обязательное поле.'})
+    missing_fields = [field for field in fields if not data.get(field)]
+    if missing_fields:
+        raise ValidationError(
+            {field: 'Обязательное поле.' for field in missing_fields})
 
 
 def validate_ingredients(ingredients):

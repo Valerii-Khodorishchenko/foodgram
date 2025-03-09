@@ -32,7 +32,11 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
             )}
          ),
     )
-    filter_horizontal = ('followings', 'cart', 'favorites')
+    filter_horizontal = (
+        # 'followings',
+        'cart',
+        'favorites'
+    )
     search_fields = ('username', 'email', 'get_full_name')
     ordering = ('username', 'email')
     list_filter = (
