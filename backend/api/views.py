@@ -23,8 +23,8 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
+from backend.settings import TYPE_FILE_SHOPPING_LIST
 from recipe.models import Ingredient, Recipe, Tag, User, Cart
-from recipe.constants import TYPE_FILE_SHOPPING_LIST
 
 
 class UserViewSet(DjoserUserViewSet):

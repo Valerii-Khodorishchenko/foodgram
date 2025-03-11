@@ -159,7 +159,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'OPTIONS': {'max_length': MAX_PASSWORD_LENGTH},
     },
 ]
-
+MAX_UPLOAD_SIZE = 10
+TYPE_FILE_SHOPPING_LIST = os.getenv('TYPE_FILE_SHOPPING_LIST', default='pdf')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
