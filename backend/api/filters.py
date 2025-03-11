@@ -23,25 +23,25 @@ class RecipeFilter(django_filters.FilterSet):
         model = Recipe
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
-    def filter_tags(self, queryset, name, value):
-        response = queryset
+    def filter_tags(self, recipes_set, name, value):
+        response = recipes_set
         if value:
-            response = queryset.none()
+            response = recipes_set.none()
             for tag in value:
-                response |= queryset.filter(tags__slug=tag.slug)
+                response |= recipes_set.filter(tags__slug=tag.slug)
         return response.distinct()
 
-    def filter_is_favorited(self, queryset, name, value):
+    def filter_is_favorited(self, recipes_set, name, value):
         if self.request.user.is_authenticated and value == '1':
             user = self.request.user
-            queryset = queryset.filter(favorited_by__user=user)
-        return queryset
+            recipes_set = recipes_set.filter(favorited_by__user=user)
+        return recipes_set
 
-    def filter_is_in_shopping_cart(self, queryset, name, value):
+    def filter_is_in_shopping_cart(self, recipes_set, name, value):
         if self.request.user.is_authenticated and value == '1':
             user = self.request.user
-            queryset = queryset.filter(in_carts__user=user)
-        return queryset
+            recipes_set = recipes_set.filter(in_carts__user=user)
+        return recipes_set
 
 
 class IngredientFilter(django_filters.FilterSet):
