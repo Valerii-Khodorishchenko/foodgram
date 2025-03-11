@@ -42,12 +42,6 @@ class User(AbstractUser):
         help_text='Загрузите изображение для аватарки.',
         null=True, default=None,
     )
-    favorites = models.ManyToManyField(
-        'Recipe', verbose_name='Избранные рецепты', related_name='favorites'
-    )
-    cart = models.ManyToManyField(
-        'Recipe', verbose_name='Корзина', related_name='cart'
-    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
@@ -74,6 +68,8 @@ class Follow(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         ordering = ('following',)
         constraints = (
             models.UniqueConstraint(
@@ -88,15 +84,16 @@ class Follow(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        'Название продукта', max_length=INGR_NAME_MAX_LENGTH,
+        'Название продукта', max_length=INGREDIENT_NAME_MAX_LENGTH,
         help_text='Название продукта.'
     )
     measurement_unit = models.CharField(
-        'Единица измерения', max_length=INGR_MUNIT_MAX_LENGTH,
+        'Единица измерения', max_length=INGREDIENT_MUNIT_MAX_LENGTH,
         help_text='Единица измерения продукта.'
     )
 
     class Meta:
+        default_related_name = 'ingredients'
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
         ordering = ('name',)
@@ -189,3 +186,50 @@ class RecipeComponent(models.Model):
 
     def __str__(self):
         return f'{self.product.name[:DESCRIPTION_LENGTH]} ({self.amount})'
+
+
+class Favorites(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='favorites',
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        'Recipe', on_delete=models.CASCADE, related_name='favorited_by',
+        verbose_name='Избранный рецепт'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата добавления')
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_favorite_recipe'
+            ),
+        )
+        unique_together = ('user', 'recipe')
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='cart',
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        'Recipe', on_delete=models.CASCADE, related_name='in_carts',
+        verbose_name='Рецепт в корзине'
+    )
+    added_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата добавления')
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'

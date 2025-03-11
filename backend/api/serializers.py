@@ -1,4 +1,3 @@
-
 from djoser.serializers import (
     UserSerializer as DjoserUserSerializer,
     UserCreateSerializer as DjoserUserCreateSerializer
@@ -8,6 +7,8 @@ from rest_framework import serializers
 
 
 from recipe.models import (
+    Favorites,
+    Cart,
     Follow,
     Ingredient,
     Recipe,
@@ -146,14 +147,14 @@ class RecipeCartFavoriteSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         recipe = self.context['recipe']
         if self.context.get('category', None) == 'favorite':
-            return self._process_action(user.favorites, recipe)
-        return self._process_action(user.cart, recipe)
+            return self._process_action(Favorites, user, recipe)
+        return self._process_action(Cart, user, recipe)
 
-    def _process_action(self, related_manager, recipe):
+    def _process_action(self, model, user, recipe):
         if self.context['request'].method == 'POST':
-            related_manager.add(recipe)
+            model.objects.create(user=user, recipe=recipe)
         else:
-            related_manager.remove(recipe)
+            model.objects.filter(user=user, recipe=recipe).first().delete()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -170,21 +171,20 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
         )
 
-    def get_is_favorited(self, obj):
+    def is_exists(self, recipe, model):
         if (
             (request := self.context.get('request'))
             and request.user.is_authenticated
         ):
-            return obj.favorites.filter(id=request.user.id).exists()
+            return model.objects.filter(
+                user=request.user, recipe=recipe).exists()
         return False
 
-    def get_is_in_shopping_cart(self, obj):
-        if (
-            (request := self.context.get('request'))
-            and request.user.is_authenticated
-        ):
-            return obj.cart.filter(id=request.user.id).exists()
-        return False
+    def get_is_favorited(self, recipe):
+        return self.is_exists(recipe, Favorites)
+
+    def get_is_in_shopping_cart(self, recipe):
+        return self.is_exists(recipe, Cart)
 
 
 class RecipeWriteIngredientSerializer(serializers.ModelSerializer):

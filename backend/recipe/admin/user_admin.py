@@ -32,11 +32,6 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
             )}
          ),
     )
-    filter_horizontal = (
-        # 'followings',
-        'cart',
-        'favorites'
-    )
     search_fields = ('username', 'email', 'get_full_name')
     ordering = ('username', 'email')
     list_filter = (
@@ -63,7 +58,7 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
     @admin.display(description='Полное имя')
     def get_full_name(self, user):
         return f'{user.last_name} {user.first_name}'
-
+    # TODO: (подписчики или подписки)
     @admin.display(description='Подписчики')
     def get_followers_count(self, user):
         return user.followers_count
@@ -84,3 +79,15 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
 
     def delete_queryset(self, request, queryset):
         super().delete_queryset(request, queryset, field_name='avatar')
+
+
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('user', 'following')
+
+
+class FavoritesAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')
+
+
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')

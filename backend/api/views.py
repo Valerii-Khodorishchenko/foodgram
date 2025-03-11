@@ -23,7 +23,7 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
-from recipe.models import Ingredient, Recipe, Tag, User
+from recipe.models import Ingredient, Recipe, Tag, User, Cart
 from recipe.constants import TYPE_FILE_SHOPPING_LIST
 
 
@@ -161,7 +161,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         type_file = TYPE_FILE_SHOPPING_LIST
         user = request.user
-        shopping_cart = user.cart.prefetch_related('ingredients').all()
+        shopping_cart = Recipe.objects.filter(in_carts__user=user).prefetch_related('ingredients').all()
         if type_file == 'csv':
             content = shopping_list.generate_csv_shopping_list(shopping_cart)
             response = HttpResponse(

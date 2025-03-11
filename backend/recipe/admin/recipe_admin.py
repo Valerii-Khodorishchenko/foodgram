@@ -54,26 +54,10 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
 
     @admin.display(description='Понравилось')
     def get_favorites_count(self, recipe):
-        return recipe.favorites.count()
-
-    # def formfield_for_dbfield(self, db_field, **kwargs):
-    #     from recipe.admin.mixins import get_img
-    #     from recipe.models import Recipe
-    #     from recipe.constants import DISPLAY_IMAGE_SIZE
-    #     field = super().formfield_for_dbfield(db_field, **kwargs)
-    #     instance = kwargs.get('instance')
-    #     print(instance)
-    #     if db_field.name == 'image':
-    #         request  = kwargs.get('request')
-    #         object_id = request.resolver_match.kwargs.get('object_id')
-    #         if recipe := Recipe.objects.filter(id=object_id).first():
-    #             image_url = recipe.image.url
-    #             field.help_text = get_img(image_url, DISPLAY_IMAGE_SIZE)
-    #     return field
+        return recipe.favorited_by.count()
 
 
-class RecipeIngredientInline(admin.TabularInline):
-    # TODO: Вернуться после исправления моделей (убрать лишний класс)
+class RecipeIngredientInline(admin.StackedInline):
     model = RecipeComponent
     extra = 1
     fields = ('product', 'amount', 'measurement_unit')

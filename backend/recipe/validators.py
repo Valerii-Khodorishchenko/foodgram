@@ -74,19 +74,19 @@ def validate_tags(tags):
 
 def validate_favorite(user, recipe, method):
     if method == 'POST':
-        if user.favorites.filter(id=recipe.id).exists():
+        if recipe.favorited_by.filter(user=user).exists():
             raise ValidationError('Рецепт уже в избранном.')
     else:
-        if not user.favorites.filter(id=recipe.id).exists():
+        if not recipe.favorited_by.filter(user=user).exists():
             raise ValidationError('Рецепт отсутствует в избранном.')
 
 
 def validate_cart(user, recipe, method):
     if method == 'POST':
-        if user.cart.filter(id=recipe.id).exists():
+        if recipe.in_carts.filter(user=user).exists():
             raise ValidationError('Рецепт уже в списке покупок.')
     else:
-        if not user.cart.filter(id=recipe.id).exists():
+        if not recipe.in_carts.filter(user=user).exists():
             raise ValidationError('Рецепт отсутствует в списке покупок.')
 
 
