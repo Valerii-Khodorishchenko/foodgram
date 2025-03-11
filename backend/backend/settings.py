@@ -3,6 +3,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -151,10 +152,11 @@ DJOSER = {
     'HIDE_USERS': False
 }
 
+MAX_PASSWORD_LENGTH = 128
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'recipe.validators.MaximumLengthPasswordValidator',
-        'OPTIONS': {'max_length': 128},
+        'OPTIONS': {'max_length': MAX_PASSWORD_LENGTH},
     },
 ]
 

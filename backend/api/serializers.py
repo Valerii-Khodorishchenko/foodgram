@@ -16,7 +16,7 @@ from recipe.models import (
     Tag,
     User
 )
-from recipe.validators import (
+from api.validators import (
     validate_favorite_or_cart,
     validate_image,
     validate_ingredients,
