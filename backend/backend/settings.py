@@ -153,7 +153,7 @@ DJOSER = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'recipe.validators.MaximumLengthValidator',
+        'NAME': 'recipe.validators.MaximumLengthPasswordValidator',
         'OPTIONS': {'max_length': 128},
     },
 ]
@@ -167,3 +167,9 @@ INTERNAL_IPS = [
 
 HASHIDS_SALT = os.getenv('SECRET_KEY', default='default_secret_key')
 HASHIDS_MIN_LENGTH = 6
+
+FILE_UPLOAD_HANDLERS = [
+    'recipe.handlers.LimitFileSizeUploadHandler',
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]

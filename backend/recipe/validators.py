@@ -2,10 +2,8 @@ import re
 
 from django.core.exceptions import ValidationError
 
-from recipe.constants import MAX_SIZE_IMG
 
-
-class MaximumLengthValidator:
+class MaximumLengthPasswordValidator:
     def __init__(self, max_length=128):
         self.max_length = max_length
 
@@ -32,14 +30,6 @@ def validate_username(username):
 def validate_image(image):
     if image is None:
         raise ValidationError('Недолжно быть пустым')
-    return validate_image_size(image)
-
-
-def validate_image_size(image):
-    if image and image.size > MAX_SIZE_IMG * 1024 * 1024:
-        raise ValidationError(
-            f'Размер изображения не может превышать {MAX_SIZE_IMG} МБ.'
-        )
     return image
 
 
