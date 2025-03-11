@@ -197,7 +197,7 @@ class RecipeWriteIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeCreatePatchSerializer(serializers.ModelSerializer):
     ingredients = RecipeWriteIngredientSerializer(
-        source='components',
+        source='products',
         many=True
     )
     tags = serializers.PrimaryKeyRelatedField(
@@ -220,7 +220,7 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         validate_required_fields(
-            data, ('components', 'tags', 'name', 'text', 'cooking_time')
+            data, ('products', 'tags', 'name', 'text', 'cooking_time')
         )
         return data
 
@@ -237,12 +237,12 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         for ingredient_data in ingredients_data:
             RecipeComponent.objects.create(
                 recipe=recipe,
-                ingredient=ingredient_data['id'],
+                product=ingredient_data['id'],
                 amount=ingredient_data['amount']
             )
 
     def create(self, validated_data):
-        ingredients_data = validated_data.pop('components')
+        ingredients_data = validated_data.pop('products')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags_data)
@@ -250,7 +250,7 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop('components')
+        ingredients_data = validated_data.pop('products')
         tags_data = validated_data.pop('tags')
         image = validated_data.pop('image', None)
         if image is not None and image != instance.image:

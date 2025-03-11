@@ -18335,7 +18335,7 @@
   "pk": 16,
   "fields": {
     "recipe": 1,
-    "ingredient": 30,
+    "product": 30,
     "amount": 4
   }
 },
@@ -18344,7 +18344,7 @@
   "pk": 17,
   "fields": {
     "recipe": 1,
-    "ingredient": 47,
+    "product": 47,
     "amount": 50
   }
 },
@@ -18353,7 +18353,7 @@
   "pk": 18,
   "fields": {
     "recipe": 1,
-    "ingredient": 232,
+    "product": 232,
     "amount": 750
   }
 },
@@ -18362,7 +18362,7 @@
   "pk": 19,
   "fields": {
     "recipe": 1,
-    "ingredient": 266,
+    "product": 266,
     "amount": 10
   }
 },
@@ -18371,7 +18371,7 @@
   "pk": 20,
   "fields": {
     "recipe": 1,
-    "ingredient": 680,
+    "product": 680,
     "amount": 5
   }
 },
@@ -18380,7 +18380,7 @@
   "pk": 21,
   "fields": {
     "recipe": 1,
-    "ingredient": 685,
+    "product": 685,
     "amount": 3
   }
 },
@@ -18389,7 +18389,7 @@
   "pk": 22,
   "fields": {
     "recipe": 1,
-    "ingredient": 1246,
+    "product": 1246,
     "amount": 5
   }
 },
@@ -18398,7 +18398,7 @@
   "pk": 37,
   "fields": {
     "recipe": 2,
-    "ingredient": 252,
+    "product": 252,
     "amount": 2000
   }
 },
@@ -18407,7 +18407,7 @@
   "pk": 38,
   "fields": {
     "recipe": 2,
-    "ingredient": 435,
+    "product": 435,
     "amount": 30
   }
 },
@@ -18416,7 +18416,7 @@
   "pk": 39,
   "fields": {
     "recipe": 2,
-    "ingredient": 520,
+    "product": 520,
     "amount": 300
   }
 },
@@ -18425,7 +18425,7 @@
   "pk": 40,
   "fields": {
     "recipe": 2,
-    "ingredient": 556,
+    "product": 556,
     "amount": 200
   }
 },
@@ -18434,7 +18434,7 @@
   "pk": 41,
   "fields": {
     "recipe": 2,
-    "ingredient": 816,
+    "product": 816,
     "amount": 2
   }
 },
@@ -18443,7 +18443,7 @@
   "pk": 42,
   "fields": {
     "recipe": 2,
-    "ingredient": 878,
+    "product": 878,
     "amount": 50
   }
 },
@@ -18452,7 +18452,7 @@
   "pk": 43,
   "fields": {
     "recipe": 2,
-    "ingredient": 1053,
+    "product": 1053,
     "amount": 50
   }
 },
@@ -18461,7 +18461,7 @@
   "pk": 44,
   "fields": {
     "recipe": 2,
-    "ingredient": 1284,
+    "product": 1284,
     "amount": 5
   }
 },
@@ -18470,7 +18470,7 @@
   "pk": 45,
   "fields": {
     "recipe": 2,
-    "ingredient": 1422,
+    "product": 1422,
     "amount": 50
   }
 },
@@ -18479,7 +18479,7 @@
   "pk": 46,
   "fields": {
     "recipe": 2,
-    "ingredient": 1567,
+    "product": 1567,
     "amount": 100
   }
 },
@@ -18488,7 +18488,7 @@
   "pk": 47,
   "fields": {
     "recipe": 2,
-    "ingredient": 1585,
+    "product": 1585,
     "amount": 500
   }
 },
@@ -18497,7 +18497,7 @@
   "pk": 48,
   "fields": {
     "recipe": 2,
-    "ingredient": 1684,
+    "product": 1684,
     "amount": 5
   }
 },
@@ -18506,7 +18506,7 @@
   "pk": 49,
   "fields": {
     "recipe": 2,
-    "ingredient": 1853,
+    "product": 1853,
     "amount": 10
   }
 },
@@ -18515,7 +18515,7 @@
   "pk": 50,
   "fields": {
     "recipe": 2,
-    "ingredient": 2055,
+    "product": 2055,
     "amount": 5
   }
 },
@@ -18524,7 +18524,7 @@
   "pk": 54,
   "fields": {
     "recipe": 3,
-    "ingredient": 1646,
+    "product": 1646,
     "amount": 25
   }
 },
@@ -18533,7 +18533,7 @@
   "pk": 55,
   "fields": {
     "recipe": 3,
-    "ingredient": 1684,
+    "product": 1684,
     "amount": 1
   }
 },
@@ -18542,7 +18542,7 @@
   "pk": 56,
   "fields": {
     "recipe": 3,
-    "ingredient": 2181,
+    "product": 2181,
     "amount": 200
   }
 }

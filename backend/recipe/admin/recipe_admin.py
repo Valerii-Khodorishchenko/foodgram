@@ -41,15 +41,15 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
     @mark_safe
     def ingredient_list(self, recipe):
         return ('<br> '.join(
-            f'{ingredient.ingredient.name} - {ingredient.amount}'
-            f'{ingredient.ingredient.measurement_unit}'
+            f'{ingredient.product.name} - {ingredient.amount}'
+            f'{ingredient.product.measurement_unit}'
             for ingredient in recipe.components.all()
         ))
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('author').prefetch_related(
-            'tags', 'components__ingredient'
+            'tags', 'components__product'
         )
 
     @admin.display(description='Понравилось')
@@ -76,16 +76,16 @@ class RecipeIngredientInline(admin.TabularInline):
     # TODO: Вернуться после исправления моделей (убрать лишний класс)
     model = RecipeComponent
     extra = 1
-    fields = ('ingredient', 'amount', 'measurement_unit')
+    fields = ('product', 'amount', 'measurement_unit')
     readonly_fields = ('measurement_unit',)
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related('ingredient', 'recipe')
+        queryset = super().get_queryset(request)
+        return queryset.select_related('product', 'recipe')
 
     @admin.display(description='Единица измерения')
     def measurement_unit(self, ingredient):
-        return ingredient.ingredient.measurement_unit
+        return ingredient.product.measurement_unit
 
 
 class TagAdmin(RecipesAdminMixin, BaseAdmin):

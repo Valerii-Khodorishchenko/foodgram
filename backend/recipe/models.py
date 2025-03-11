@@ -5,8 +5,8 @@ from django.db import models
 from recipe.constants import (
     DESCRIPTION_LENGTH,
     FIRST_NAME_MAX_LENGTH,
-    INGR_NAME_MAX_LENGTH,
-    INGR_MUNIT_MAX_LENGTH,
+    INGREDIENT_NAME_MAX_LENGTH,
+    INGREDIENT_MUNIT_MAX_LENGTH,
     INGREDIENT_MIN_VALUE,
     RECIPE_NAME_MAX_LENGTH,
     TAG_NAME_MAX_LENGTH,
@@ -167,12 +167,12 @@ class Recipe(models.Model):
 class RecipeComponent(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, verbose_name='Рецепт')
-    ingredient = models.ForeignKey(
+    product = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE, verbose_name='Продукт')
     amount = models.PositiveSmallIntegerField(
-        'Количество',
+        'Мера',
         validators=[MinValueValidator(INGREDIENT_MIN_VALUE)],
-        help_text='Количество продукта'
+        help_text='Единица измерений продукта'
     )
 
     class Meta:
@@ -180,12 +180,12 @@ class RecipeComponent(models.Model):
         verbose_name = 'Компонент блюда'
         verbose_name_plural = 'Компоненты блюд'
         ordering = ('recipe',)
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
-                fields=['recipe', 'ingredient'],
+                fields=('recipe', 'product'),
                 name='ingredient_in_recipe'
-            )
-        ]
+            ),
+        )
 
     def __str__(self):
-        return f'{self.ingredient.name[:DESCRIPTION_LENGTH]} ({self.amount})'
+        return f'{self.product.name[:DESCRIPTION_LENGTH]} ({self.amount})'

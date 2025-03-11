@@ -11,7 +11,7 @@ def get_ingredients(shopping_cart):
     ingredients = {}
     for recipe in shopping_cart:
         for component in recipe.components.all():
-            ingredient = component.ingredient
+            ingredient = component.product
             amount = component.amount
             unit = ingredient.measurement_unit
             if ingredient.name in ingredients:
