@@ -171,7 +171,7 @@ HASHIDS_SALT = os.getenv('SECRET_KEY', default='default_secret_key')
 HASHIDS_MIN_LENGTH = 6
 
 FILE_UPLOAD_HANDLERS = [
-    'recipe.handlers.LimitFileSizeUploadHandler',
+    'backend.handlers.LimitFileSizeUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
