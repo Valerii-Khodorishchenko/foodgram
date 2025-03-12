@@ -87,7 +87,8 @@ class SubscribeSerializer(UserSerializer):
         read_only_fields = UserSerializer.Meta.fields
 
     def get_recipes(self, obj):
-        recipes_limit = self.context.get('recipes_limit', None)
+        request = self.context.get('request')
+        recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit is not None:
             recipes_limit = int(recipes_limit)
         recipes = Recipe.objects.filter(author=obj)[:recipes_limit]

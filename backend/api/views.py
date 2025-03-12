@@ -22,7 +22,7 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
-from recipe.models import Ingredient, Recipe, Tag, User, Cart
+from recipe.models import Cart, Favorites, Ingredient, Recipe, Tag, User
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -54,21 +54,16 @@ class UserViewSet(DjoserUserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def get_subscriptions(self, request):
-        user = request.user
-        subscriptions = User.objects.filter(following__user=user)
-        recipes_limit = request.query_params.get('recipes_limit', None)
+        subscriptions = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(subscriptions)
         if page is not None:
-            serializer = SubscribeSerializer(
-                page, many=True,
-                context={'request': request, 'recipes_limit': recipes_limit}
+            return self.get_paginated_response(
+                SubscribeSerializer(
+                    page, many=True, context={'request': request}
+                ).data
             )
-            return self.get_paginated_response(serializer.data)
-
-        serializer = SubscribeSerializer(
-            subscriptions, many=True,
-            context={'request': request, 'recipes_limit': recipes_limit}
-        )
+        return Response(SubscribeSerializer(
+            subscriptions, many=True, context={'request': request}).data)
 
     @action(
         detail=True,
