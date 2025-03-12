@@ -44,34 +44,3 @@ def validate_tags(tags):
             'Теги не должны повторяться.'
         )
     return tags
-
-
-def validate_favorite(user, recipe, method):
-    if method == 'POST':
-        if recipe.favorited_by.filter(user=user).exists():
-            raise ValidationError('Рецепт уже в избранном.')
-    else:
-        if not recipe.favorited_by.filter(user=user).exists():
-            raise ValidationError('Рецепт отсутствует в избранном.')
-
-
-def validate_cart(user, recipe, method):
-    if method == 'POST':
-        if recipe.in_carts.filter(user=user).exists():
-            raise ValidationError('Рецепт уже в списке покупок.')
-    else:
-        if not recipe.in_carts.filter(user=user).exists():
-            raise ValidationError('Рецепт отсутствует в списке покупок.')
-
-
-def validate_favorite_or_cart(context, category):
-    user = context['request'].user
-    recipe = context['recipe']
-    method = context['request'].method
-    if category == 'favorite':
-        validate_favorite(user, recipe, method)
-    elif category == 'cart':
-        validate_cart(user, recipe, method)
-    else:
-        raise ValidationError('Неверная категория.')
-    return recipe

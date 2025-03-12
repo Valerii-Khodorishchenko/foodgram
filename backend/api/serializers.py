@@ -17,7 +17,6 @@ from recipe.models import (
     User
 )
 from api.validators import (
-    validate_favorite_or_cart,
     validate_image,
     validate_ingredients,
     validate_required_fields,
@@ -137,24 +136,6 @@ class RecipeCartFavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = read_only_fields = ('id', 'name', 'image', 'cooking_time')
-
-    def validate(self, attrs):
-        return validate_favorite_or_cart(
-            self.context, self.context.get('category')
-        )
-
-    def save(self, **kwargs):
-        user = self.context['request'].user
-        recipe = self.context['recipe']
-        if self.context.get('category', None) == 'favorite':
-            return self._process_action(Favorites, user, recipe)
-        return self._process_action(Cart, user, recipe)
-
-    def _process_action(self, model, user, recipe):
-        if self.context['request'].method == 'POST':
-            model.objects.create(user=user, recipe=recipe)
-        else:
-            model.objects.filter(user=user, recipe=recipe).first().delete()
 
 
 class RecipeSerializer(serializers.ModelSerializer):

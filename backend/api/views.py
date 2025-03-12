@@ -104,6 +104,31 @@ class RecipeViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'patch', 'delete')
     serializer_class = RecipeCreatePatchSerializer
 
+    @staticmethod
+    def handle_favorite_or_cart(request, model, recipe):
+        serializer = RecipeCartFavoriteSerializer(recipe)
+        category = 'Избранном' if model == Favorites else 'Корзине'
+        if request.method == 'POST':
+            if not model.objects.filter(
+                user=request.user, recipe=recipe
+            ).exists():
+                model.objects.get_or_create(user=request.user, recipe=recipe)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED
+                )
+            return Response(
+                {'error': 'Рецепт уже в {}'.format(category)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if model.objects.filter(user=request.user, recipe=recipe).exists():
+            model.objects.filter(user=request.user, recipe=recipe).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'error': 'Рецепт отсутствует в {}'.format(category)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk):
         get_object_or_404(Recipe, pk=pk)
@@ -118,18 +143,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk):
         recipe = self.get_object()
-        serializer = RecipeCartFavoriteSerializer(
-            data=request.data,
-            context={
-                'request': request,
-                'recipe': recipe,
-                'category': 'favorite'
-            })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        if request.method == 'POST':
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.handle_favorite_or_cart(request, Favorites, recipe)
 
     @action(
         detail=True, methods=('post', 'delete',), url_path='shopping_cart',
@@ -137,18 +151,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         recipe = self.get_object()
-        serializer = RecipeCartFavoriteSerializer(
-            data=request.data,
-            context={
-                'request': request,
-                'recipe': recipe,
-                'category': 'cart'
-            })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        if request.method == 'POST':
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.handle_favorite_or_cart(request, Cart, recipe)
 
     @action(
         detail=False, methods=('get',), url_path='download_shopping_cart',
