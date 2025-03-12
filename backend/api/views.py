@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (
     IsAuthenticated,
     IsAuthenticatedOrReadOnly
@@ -27,7 +26,6 @@ from recipe.models import Ingredient, Recipe, Tag, User, Cart
 
 
 class UserViewSet(DjoserUserViewSet):
-    pagination_class = LimitOffsetPagination
     http_method_names = ('get', 'post', 'put', 'delete')
 
     @action(
@@ -100,7 +98,6 @@ class UserViewSet(DjoserUserViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrAdmin,)
