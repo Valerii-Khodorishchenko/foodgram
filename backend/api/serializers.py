@@ -20,7 +20,6 @@ from api.validators import (
     validate_image,
     validate_ingredients,
     validate_required_fields,
-    validate_subscribe,
     validate_tags,
 )
 
@@ -93,22 +92,6 @@ class SubscribeSerializer(UserSerializer):
             recipes_limit = int(recipes_limit)
         recipes = Recipe.objects.filter(author=obj)[:recipes_limit]
         return RecipeCartFavoriteSerializer(recipes, many=True).data
-
-    def validate(self, data):
-        return validate_subscribe(
-            data, self.context['request'].user,
-            self.context['target_user'], self.context['request'].method
-        )
-
-    def save(self, **kwargs):
-        user = self.context['request'].user
-        target_user = self.context['target_user']
-        method = self.context['request'].method
-        if method == 'POST':
-            Follow.objects.create(user=user, following=target_user)
-        elif method == 'DELETE':
-            Follow.objects.filter(user=user, following=target_user).delete()
-        return target_user
 
 
 class IngredientSerializer(serializers.ModelSerializer):

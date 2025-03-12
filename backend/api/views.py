@@ -22,7 +22,7 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
-from recipe.models import Cart, Favorites, Ingredient, Recipe, Tag, User
+from recipe.models import Cart, Favorites, Follow, Ingredient, Recipe, Tag, User
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -76,18 +76,33 @@ class UserViewSet(DjoserUserViewSet):
         recipes_limit = request.query_params.get('recipes_limit', None)
         serializer = SubscribeSerializer(
             target_user,
-            data=request.data,
             context={
                 'request': request,
                 'target_user': target_user,
                 'recipes_limit': recipes_limit
             })
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = request.user
         if request.method == 'POST':
+            if target_user.following.filter(user=user).exists():
+                return Response(
+                    {'error': 'Вы уже подписаны на этого пользователя.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            elif target_user == user:
+                return Response(
+                    {'error': 'Нельзя подписаться на себя.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            Follow.objects.create(user=user, following=target_user)
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED
             )
+        if not user.followers.filter(following=target_user).exists():
+            return Response(
+                {'error': 'Вы не подписаны на этого пользователя.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user.followers.filter(following=target_user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -107,7 +122,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             if not model.objects.filter(
                 user=request.user, recipe=recipe
             ).exists():
-                model.objects.get_or_create(user=request.user, recipe=recipe)
+                model.objects.create(user=request.user, recipe=recipe)
                 return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED
