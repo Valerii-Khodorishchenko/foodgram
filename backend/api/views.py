@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets, status
@@ -23,7 +23,6 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
-from backend.settings import TYPE_FILE_SHOPPING_LIST
 from recipe.models import Ingredient, Recipe, Tag, User, Cart
 
 
@@ -159,22 +158,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        type_file = TYPE_FILE_SHOPPING_LIST
         user = request.user
-        shopping_cart = Recipe.objects.filter(in_carts__user=user).prefetch_related('ingredients').all()
-        if type_file == 'csv':
-            content = shopping_list.generate_csv_shopping_list(shopping_cart)
-            response = HttpResponse(
-                content, content_type='text/csv; charset=utf-8')
-        elif type_file == 'pdf':
-            content = shopping_list.generate_pdf_shopping_list(shopping_cart)
-            response = HttpResponse(content, content_type='application/pdf')
-        else:
-            type_file = 'txt'
-            content = shopping_list.generate_txt_shopping_list(shopping_cart)
-            response = HttpResponse(content, content_type='text/plain')
+        shopping_cart = Recipe.objects.filter(
+            in_carts__user=user).prefetch_related('ingredients').all()
+        content = shopping_list.generate_txt_shopping_list(shopping_cart)
+        response = FileResponse(content, content_type='text/plain')
         response['Content-Disposition'] = (
-            f'attachment; filename="shopping_list.{type_file}"'
+            f'attachment; filename="shopping_list.txt"'
         )
         return response
 
