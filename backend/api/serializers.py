@@ -1,14 +1,14 @@
 from djoser.serializers import (
-    UserSerializer as DjoserUserSerializer,
-    UserCreateSerializer as DjoserUserCreateSerializer
+    UserCreateSerializer as DjoserUserCreateSerializer,
+    UserSerializer as DjoserUserSerializer
 )
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 
 from recipe.models import (
-    Favorites,
     Cart,
+    Favorites,
     Follow,
     Ingredient,
     Recipe,
@@ -18,7 +18,7 @@ from recipe.models import (
 )
 from api.validators import (
     validate_image,
-    validate_ingredients,
+    validate_products,
     validate_required_fields,
     validate_tags,
 )
@@ -192,30 +192,30 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
     def validate_image(self, image):
         return validate_image(image)
 
-    def validate_ingredients(self, ingredients):
-        return validate_ingredients(ingredients)
+    def validate_ingredients(self, products):
+        return validate_products(products)
 
     def validate_tags(self, tags):
         return validate_tags(tags)
 
-    def _handle_ingredients(self, recipe, ingredients_data):
-        for ingredient_data in ingredients_data:
+    def _handle_products(self, recipe, products_data):
+        for product_data in products_data:
             RecipeComponent.objects.create(
                 recipe=recipe,
-                product=ingredient_data['id'],
-                amount=ingredient_data['amount']
+                product=product_data['id'],
+                amount=product_data['amount']
             )
 
     def create(self, validated_data):
-        ingredients_data = validated_data.pop('products')
+        products_data = validated_data.pop('products')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags_data)
-        self._handle_ingredients(recipe, ingredients_data)
+        self._handle_products(recipe, products_data)
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop('products')
+        products_data = validated_data.pop('products')
         tags_data = validated_data.pop('tags')
         image = validated_data.pop('image', None)
         if image is not None and image != instance.image:
@@ -225,9 +225,9 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         if tags_data is not None:
             instance.tags.set(tags_data)
-        if ingredients_data is not None:
+        if products_data is not None:
             instance.components.all().delete()
-            self._handle_ingredients(instance, ingredients_data)
+            self._handle_products(instance, products_data)
         instance.save()
         return instance
 

@@ -6,13 +6,13 @@ from recipe.constants import (
     DESCRIPTION_LENGTH,
     FIRST_NAME_MAX_LENGTH,
     INGREDIENT_NAME_MAX_LENGTH,
-    INGREDIENT_MUNIT_MAX_LENGTH,
     INGREDIENT_MIN_VALUE,
+    INGREDIENT_MUNIT_MAX_LENGTH,
     RECIPE_NAME_MAX_LENGTH,
+    SECOND_NAME_MAX_LENGTH,
     TAG_NAME_MAX_LENGTH,
     TAG_SLUG_MAX_LENGTH,
     TIME_MIN_VALUE,
-    SECOND_NAME_MAX_LENGTH,
     USERNAME_MAX_LENGTH,
 )
 from recipe.validators import validate_username
@@ -139,8 +139,8 @@ class Recipe(models.Model):
     text = models.TextField('Описание', help_text='Описание рецепта.')
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        help_text='Время приготовления в минутах.',
-        validators=[MinValueValidator(TIME_MIN_VALUE),]
+        validators=[MinValueValidator(TIME_MIN_VALUE)],
+        help_text='Время приготовления в минутах.'
     )
     author = models.ForeignKey(
         User, verbose_name='Автор', on_delete=models.CASCADE,

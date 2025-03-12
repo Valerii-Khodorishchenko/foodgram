@@ -2,8 +2,8 @@ import re
 
 from django.utils.text import slugify
 
-from recipe.models import Tag
 from recipe.management.base_import import BaseImport
+from recipe.models import Tag
 
 
 class Command(BaseImport):

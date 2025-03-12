@@ -1,7 +1,7 @@
-from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -22,7 +22,15 @@ from api.serializers import (
     SubscribeSerializer,
     TagSerializer
 )
-from recipe.models import Cart, Favorites, Follow, Ingredient, Recipe, Tag, User
+from recipe.models import (
+    Cart,
+    Favorites,
+    Follow,
+    Ingredient,
+    Recipe,
+    Tag,
+    User
+)
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -174,7 +182,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         content = shopping_list.generate_txt_shopping_list(shopping_cart)
         response = FileResponse(content, content_type='text/plain')
         response['Content-Disposition'] = (
-            f'attachment; filename="shopping_list.txt"'
+            'attachment; filename="shopping_list.txt"'
         )
         return response
 

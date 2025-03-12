@@ -14,13 +14,13 @@ def validate_required_fields(data, fields):
             {field: 'Обязательное поле.' for field in missing_fields})
 
 
-def validate_ingredients(ingredients):
-    if not ingredients:
+def validate_products(products):
+    if not products:
         raise ValidationError('Поле не может быть пустым.')
-    unique_ingredients = {ingredient['id'] for ingredient in ingredients}
-    if len(ingredients) != len(unique_ingredients):
+    unique_products = {product['id'] for product in products}
+    if len(products) != len(unique_products):
         raise ValidationError('Ингредиенты не должны повторяться.')
-    return ingredients
+    return products
 
 
 def validate_tags(tags):

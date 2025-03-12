@@ -1,5 +1,5 @@
-from recipe.models import Ingredient
 from recipe.management.base_import import BaseImport
+from recipe.models import Ingredient
 
 
 class Command(BaseImport):

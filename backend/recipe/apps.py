@@ -1,5 +1,5 @@
-from django.contrib import admin
 from django.apps import AppConfig
+from django.contrib import admin
 from django.contrib.admin import AdminSite
 
 
