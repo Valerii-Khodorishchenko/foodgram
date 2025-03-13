@@ -29,22 +29,22 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
     @admin.display(description='Теги')
     @mark_safe
     def tag_list(self, recipe):
-        return ('<br> '.join(
+        return '<br> '.join(
             '<a href="{0}">#{1}</a>'.format(
                 reverse('admin:recipe_tag_change', args=[tag.id]),
                 tag.name
             )
             for tag in recipe.tags.all()
-        ))
+        )
 
     @admin.display(description='Ингредиенты')
     @mark_safe
     def ingredient_list(self, recipe):
-        return ('<br> '.join(
+        return '<br> '.join(
             f'{ingredient.product.name} - {ingredient.amount}'
             f'{ingredient.product.measurement_unit}'
             for ingredient in recipe.components.all()
-        ))
+        )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -54,7 +54,7 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
 
     @admin.display(description='Понравилось')
     def get_favorites_count(self, recipe):
-        return recipe.favorited_by.count()
+        return recipe.favorites.count()
 
 
 class RecipeIngredientInline(admin.StackedInline):

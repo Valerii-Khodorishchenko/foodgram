@@ -1,11 +1,10 @@
 import numpy
 
 from django.contrib import admin
-from django.utils.translation import gettext_lazy
 
 
 class CookingTimeFilter(admin.SimpleListFilter):
-    title = gettext_lazy('Время приготовления')
+    title = 'Время приготовления'
     parameter_name = 'cooking_time'
 
     def separators(self, queryset):
@@ -16,87 +15,87 @@ class CookingTimeFilter(admin.SimpleListFilter):
         medium = int(numpy.floor(numpy.percentile(cooking_times, 66)))
         return quick, medium
 
+    def filter_by_time_range(self, queryset, time_range):
+        return queryset.filter(cooking_time__range=time_range)
+
     def lookups(self, request, model_admin):
         recipes = model_admin.get_queryset(request)
         quick, medium = self.separators(recipes)
-        quick_recipes = recipes.filter(cooking_time__lt=quick)
-        medium_recipes = recipes.filter(
-            cooking_time__gte=quick, cooking_time__lte=medium
-        )
-        slow_recipes = recipes.filter(cooking_time__gt=medium)
+        self.filter_range = {
+            'quick': (0, quick),
+            'medium': (quick, medium),
+            'slow': (medium, 999999999)
+        }
 
         return (
-            ('quick', 'быстрее {0}минут ({1})'.format(
-                quick, quick_recipes.count()
+            ('quick', 'быстрее {0} минут ({1})'.format(
+                quick,
+                self.filter_by_time_range(
+                    recipes,
+                    self.filter_range.get('quick')
+                ).count()
             )),
-            ('medium', 'быстрее {0}минут ({1})'.format(
-                medium, medium_recipes.count()
+            ('medium', 'быстрее {0} минут ({1})'.format(
+                medium,
+                self.filter_by_time_range(
+                    recipes,
+                    self.filter_range.get('medium')
+                ).count()
             )),
-            ('slow', 'долше {0}минут ({1})'.format(
-                medium, slow_recipes.count()
+            ('slow', 'долше {0} минут ({1})'.format(
+                medium,
+                self.filter_by_time_range(
+                    recipes,
+                    self.filter_range.get('slow')
+                ).count()
             ))
         )
 
     def queryset(self, request, queryset):
-        quick, medium = self.separators(queryset)
-        if self.value() == 'quick':
-            return queryset.filter(cooking_time__lt=quick)
-        if self.value() == 'medium':
-            return queryset.filter(
-                cooking_time__gte=quick, cooking_time__lt=medium
+        if self.value() in self.filter_range:
+            return self.filter_by_time_range(
+                queryset,
+                self.filter_range.get(self.value())
             )
-        if self.value() == 'slow':
-            return queryset.filter(cooking_time__gte=medium)
         return queryset
 
 
-class HasRecipesFilter(admin.SimpleListFilter):
-    title = gettext_lazy('Есть рецепты')
+class HasValueFilter(admin.SimpleListFilter):
+    LOOKUPS = (
+        ('yes', 'Да'),
+        ('no', 'Нет')
+    )
+
+    def lookups(self, request, model_admin):
+        return self.LOOKUPS
+
+    def queryset(self, request, queryset, field):
+        if self.value() == 'yes':
+            return queryset.filter(**{f'{field}__isnull': False}).distinct()
+        if self.value() == 'no':
+            return queryset.filter(**{f'{field}__isnull': True})
+        return queryset
+
+
+class HasRecipesFilter(HasValueFilter):
+    title = 'Есть рецепты'
     parameter_name = 'has_recipes'
 
-    def lookups(self, request, model_admin):
-        return (('yes', 'Да'), ('no', 'Нет'))
-
     def queryset(self, request, queryset):
-        if self.value() == 'yes':
-            return queryset.filter(recipes__isnull=False).distinct()
-        if self.value() == 'no':
-            return queryset.filter(recipes__isnull=True)
-        return queryset
+        return super().queryset(request, queryset, 'recipes')
 
 
-class HasSubscriptionsFilter(admin.SimpleListFilter):
-    title = gettext_lazy('Есть подписки')
+class HasSubscriptionsFilter(HasValueFilter):
+    title = 'Есть подписки'
     parameter_name = 'has_subscriptions'
 
-    def lookups(self, request, model_admin):
-        return (('yes', 'Да'), ('no', 'Нет'))
-
     def queryset(self, request, queryset):
-        if self.value() == 'yes':
-            return queryset.filter(followings__isnull=False).distinct()
-        if self.value() == 'no':
-            return queryset.filter(followings__isnull=True)
-        return queryset
+        return super().queryset(request, queryset, 'followers')
 
 
-class HasFollowersFilter(admin.SimpleListFilter):
-    title = gettext_lazy('Есть подписчики')
+class HasFollowersFilter(HasValueFilter):
+    title = 'Есть подписчики'
     parameter_name = 'has_followers'
 
-    def lookups(self, request, model_admin):
-        return (('yes', 'Да'), ('no', 'Нет'))
-
     def queryset(self, request, queryset):
-        users_list = []
-        if self.value() == 'yes':
-            for user in queryset:
-                if queryset.filter(followings=user).exists():
-                    users_list.append(user)
-            return queryset.filter(id__in=[user.id for user in users_list])
-        if self.value() == 'no':
-            for user in queryset:
-                if queryset.filter(followings=user).exists():
-                    users_list.append(user)
-            return queryset.exclude(id__in=[user.id for user in users_list])
-        return queryset
+        return super().queryset(request, queryset, 'authors')

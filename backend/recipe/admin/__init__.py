@@ -3,9 +3,10 @@ from django.contrib import admin
 
 from recipe.admin.user_admin import (
     UserAdmin,
-    FavoritesAdmin,
+    FavoritesCartAdmin,
+    # FavoritesAdmin,
     FollowAdmin,
-    CartAdmin
+    # CartAdmin
 )
 from recipe.admin.recipe_admin import (
     IngredientAdmin,
@@ -27,8 +28,8 @@ from recipe.models import (
 RecipeAdmin.inlines = (RecipeIngredientInline,)
 admin.site.register(User, UserAdmin)
 admin.site.register(Follow, FollowAdmin)
-admin.site.register(Favorites, FavoritesAdmin)
-admin.site.register(Cart, CartAdmin)
+admin.site.register(Cart, FavoritesCartAdmin)
+admin.site.register(Favorites, FavoritesCartAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)

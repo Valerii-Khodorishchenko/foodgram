@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
 
 from recipe.admin.filters import (
     HasFollowersFilter, HasRecipesFilter, HasSubscriptionsFilter)
@@ -13,7 +12,8 @@ from recipe.models import Cart, Favorites, Follow
 class UserAdmin(DisplayImageMixin, UserAdmin):
     list_display = (
         'username', 'display_avatar', 'email', 'get_full_name',
-        'followers_count', 'following_count', 'favorites_count', 'cart_count'
+        'recipes_count', 'followers_count', 'following_count',
+        'favorites_count', 'cart_count'
     )
     fieldsets = (
         (None, {'fields': ('avatar',)}),
@@ -49,17 +49,13 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
         return super().formfield_for_dbfield(
             db_field, model=get_user_model(), field_name='avatar', **kwargs)
 
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        return queryset.annotate(
-            followings_count=Count('followers'),
-            favorites_count=Count('favorites'),
-            cart_count=Count('cart'),
-        )
-
     @admin.display(description='Полное имя')
     def get_full_name(self, user):
         return f'{user.last_name} {user.first_name}'
+
+    @admin.display(description='Рецепты')
+    def recipes_count(self, obj):
+        return obj.recipes.all().count()
 
     @admin.display(description='Понравилось')
     def favorites_count(self, obj):
@@ -67,7 +63,7 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
 
     @admin.display(description='Корзина')
     def cart_count(self, user):
-        return user.cart.all().count()
+        return user.carts.all().count()
 
     @admin.display(description='Подписки')
     def followers_count(self, users):
@@ -75,7 +71,7 @@ class UserAdmin(DisplayImageMixin, UserAdmin):
 
     @admin.display(description='Подписчики')
     def following_count(self, users):
-        return users.following.count()
+        return users.authors.count()
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change, field_name='avatar')
@@ -95,17 +91,22 @@ class FollowAdmin(admin.ModelAdmin):
     ordering = ('user',)
 
 
-@admin.register(Favorites)
-class FavoritesAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe', 'created_at')
-    search_fields = ('user__username', 'recipe__name')
-    list_filter = ('user', 'recipe')
-    ordering = ('-created_at',)
+# @admin.register(Favorites)
+# class FavoritesAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'recipe',)
+#     search_fields = ('user__username', 'recipe__name')
+#     list_filter = ('user', 'recipe')
 
 
-@admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe', 'added_at')
+# @admin.register(Cart)
+# class CartAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'recipe')
+#     search_fields = ('user__username', 'recipe__name')
+#     list_filter = ('user', 'recipe')
+
+
+@admin.register(Favorites, Cart)
+class FavoritesCartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')
     search_fields = ('user__username', 'recipe__name')
     list_filter = ('user', 'recipe')
-    ordering = ('-added_at',)

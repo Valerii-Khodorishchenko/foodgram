@@ -6,8 +6,8 @@ from recipe.constants import (
     DESCRIPTION_LENGTH,
     FIRST_NAME_MAX_LENGTH,
     INGREDIENT_NAME_MAX_LENGTH,
-    INGREDIENT_MIN_VALUE,
     INGREDIENT_MUNIT_MAX_LENGTH,
+    MIN_INGREDIENT_AMOUNT,
     RECIPE_NAME_MAX_LENGTH,
     SECOND_NAME_MAX_LENGTH,
     TAG_NAME_MAX_LENGTH,
@@ -22,8 +22,6 @@ class User(AbstractUser):
     username = models.CharField(
         'Псевдоним', max_length=USERNAME_MAX_LENGTH, unique=True,
         validators=[validate_username],
-        help_text='Уникальный псевдоним. Используйте только буквы, цифры'
-                  ' и символы @/./+/-/_.'
     )
     email = models.EmailField(
         'Адрес электронной почты', unique=True,
@@ -63,7 +61,7 @@ class Follow(models.Model):
     )
     following = models.ForeignKey(
         User,
-        related_name='following',
+        related_name='authors',
         on_delete=models.CASCADE
     )
 
@@ -84,7 +82,7 @@ class Follow(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        'Название продукта', max_length=INGREDIENT_NAME_MAX_LENGTH,
+        'Название', max_length=INGREDIENT_NAME_MAX_LENGTH,
         help_text='Название продукта.'
     )
     measurement_unit = models.CharField(
@@ -138,7 +136,7 @@ class Recipe(models.Model):
     )
     text = models.TextField('Описание', help_text='Описание рецепта.')
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления',
+        verbose_name='Время приготовления в минутах',
         validators=[MinValueValidator(TIME_MIN_VALUE)],
         help_text='Время приготовления в минутах.'
     )
@@ -168,7 +166,7 @@ class RecipeComponent(models.Model):
         Ingredient, on_delete=models.CASCADE, verbose_name='Продукт')
     amount = models.PositiveSmallIntegerField(
         'Мера',
-        validators=[MinValueValidator(INGREDIENT_MIN_VALUE)],
+        validators=[MinValueValidator(MIN_INGREDIENT_AMOUNT)],
         help_text='Единица измерений продукта'
     )
 
@@ -188,19 +186,24 @@ class RecipeComponent(models.Model):
         return f'{self.product.name[:DESCRIPTION_LENGTH]} ({self.amount})'
 
 
-class Favorites(models.Model):
+class UserRecipeRelation(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='favorites',
-        verbose_name='Пользователь'
+        User, on_delete=models.CASCADE, verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
-        'Recipe', on_delete=models.CASCADE, related_name='favorited_by',
-        verbose_name='Избранный рецепт'
+        'Recipe', on_delete=models.CASCADE, verbose_name='Рецепт'
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата добавления')
 
     class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe}'
+
+
+class Favorites(UserRecipeRelation):
+    class Meta:
+        default_related_name = 'favorites'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные'
         constraints = (
@@ -211,25 +214,9 @@ class Favorites(models.Model):
         )
         unique_together = ('user', 'recipe')
 
-    def __str__(self):
-        return f'{self.user} -> {self.recipe}'
 
-
-class Cart(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='cart',
-        verbose_name='Пользователь'
-    )
-    recipe = models.ForeignKey(
-        'Recipe', on_delete=models.CASCADE, related_name='in_carts',
-        verbose_name='Рецепт в корзине'
-    )
-    added_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Дата добавления')
-
+class Cart(UserRecipeRelation):
     class Meta:
+        default_related_name = 'carts'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзины'
-
-    def __str__(self):
-        return f'{self.user} -> {self.recipe}'

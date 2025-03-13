@@ -62,7 +62,7 @@ class UserViewSet(DjoserUserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def get_subscriptions(self, request):
-        subscriptions = User.objects.filter(following__user=request.user)
+        subscriptions = User.objects.filter(authors__user=request.user)
         page = self.paginate_queryset(subscriptions)
         if page is not None:
             return self.get_paginated_response(
@@ -91,7 +91,7 @@ class UserViewSet(DjoserUserViewSet):
             })
         user = request.user
         if request.method == 'POST':
-            if target_user.following.filter(user=user).exists():
+            if target_user.authors.filter(user=user).exists():
                 return Response(
                     {'error': 'Вы уже подписаны на этого пользователя.'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -149,11 +149,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk):
-        get_object_or_404(Recipe, pk=pk)
-        short_url = request.build_absolute_uri(
-            reverse('recipe-short-url', args=[pk])
-        )
-        return Response({'short-link': short_url}, status=status.HTTP_200_OK)
+        if not Recipe.objects.filter(pk=pk).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'short-link': request.build_absolute_uri(
+            reverse('recipe:recipe-short-url', args=[pk])
+        )}, status=status.HTTP_200_OK)
 
     @action(
         detail=True, methods=('post', 'delete'), url_path='favorite',
@@ -178,7 +178,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         user = request.user
         shopping_cart = Recipe.objects.filter(
-            in_carts__user=user).prefetch_related('ingredients').all()
+            carts__user=user).prefetch_related('ingredients').all()
         content = shopping_list.generate_txt_shopping_list(shopping_cart)
         response = FileResponse(content, content_type='text/plain')
         response['Content-Disposition'] = (

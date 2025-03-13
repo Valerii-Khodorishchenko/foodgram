@@ -67,7 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-if os.getenv('USE_POSTGRES_DB', default='False') == 'True':
+if os.getenv('USE_POSTGRES_DB', default='True') == 'True':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -125,7 +125,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
-    'EXCEPTION_HANDLER': 'api.exceptions.not_found',
     'DEFAULT_PAGINATION_CLASS': 'api.paginators.LimitPagePagination',
     'PAGE_SIZE': 6,
 }
@@ -152,13 +151,6 @@ DJOSER = {
     'HIDE_USERS': False
 }
 
-MAX_PASSWORD_LENGTH = 128
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'recipe.validators.MaximumLengthPasswordValidator',
-        'OPTIONS': {'max_length': MAX_PASSWORD_LENGTH},
-    },
-]
 MAX_UPLOAD_SIZE = 10
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

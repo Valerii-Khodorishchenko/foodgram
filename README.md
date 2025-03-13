@@ -276,13 +276,13 @@ bash superuser.sh
 без дублирования ингридиентов.
 Команды для добавления:
 ```bash
-python3 backend/manage.py load_ingredients path_to_file/ingredients.csv
+python3 backend/manage.py load_ingredients data/ingredients.csv
 ```
 
 ```bash
-python3 backend/manage.py load_ingredients path_to_file/ingredients.json
+python3 backend/manage.py load_ingredients data/ingredients.json
 ```
--  ```path_to_file``` путь к директории с файлами для заполнения ```.db``` 
+-  ```data``` путь к директории с файлами для заполнения ```.db``` 
 формате ```.csv``` и ```.json```.
 
 В директории ```data/``` есть образцы файлов ```ingredients.csv``` и 
@@ -293,13 +293,13 @@ python3 backend/manage.py load_ingredients path_to_file/ingredients.json
 без дублирования тегов.
 Команды для добавления:
 ```bash
-python3 backend/manage.py load_tags path_to_file/tags.csv
+python3 backend/manage.py load_tags data/tags.csv
 ```
 
 ```bash
-python3 backend/manage.py load_tags path_to_file/tags.json
+python3 backend/manage.py load_tags data/tags.json
 ```
--  ```path_to_file``` путь к директории с файлами для заполнения ```.db```
+-  ```data``` путь к директории с файлами для заполнения ```.db```
 формате ```.csv``` и ```.json```.
 
 В директории ```data/``` есть образцы файлов ```tags.csv``` и ```tags.json```.

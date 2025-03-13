@@ -34,13 +34,13 @@ class RecipeFilter(django_filters.FilterSet):
     def filter_is_favorited(self, recipes_set, name, value):
         if self.request.user.is_authenticated and value == '1':
             user = self.request.user
-            recipes_set = recipes_set.filter(favorited_by__user=user)
+            recipes_set = recipes_set.filter(favorites__user=user)
         return recipes_set
 
     def filter_is_in_shopping_cart(self, recipes_set, name, value):
         if self.request.user.is_authenticated and value == '1':
             user = self.request.user
-            recipes_set = recipes_set.filter(in_carts__user=user)
+            recipes_set = recipes_set.filter(carts__user=user)
         return recipes_set
 
 

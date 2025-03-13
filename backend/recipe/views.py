@@ -1,13 +1,11 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
+from rest_framework import status
+from rest_framework.response import Response
 
 from recipe.models import Recipe
 
 
-def recipe_redirect(request, pk):
-    recipe = get_object_or_404(Recipe, pk=pk)
-    return redirect('api:recipes-detail', pk=recipe.pk)
-
-
-def redirect_short_link(request, short_id):
-    recipe = get_object_or_404(Recipe, id=short_id)
-    return redirect('recipe:recipe', pk=recipe.id)
+def recipe_redirect(request, recipe_id):
+    if Recipe.objects.filter(pk=recipe_id).exists():
+        return redirect('api:recipes-detail', pk=recipe_id)
+    return Response(status=status.HTTP_404_NOT_FOUND)
