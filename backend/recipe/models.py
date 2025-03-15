@@ -80,26 +80,6 @@ class Follow(models.Model):
         return f'{self.user} подписан на {self.following}'
 
 
-class Ingredient(models.Model):
-    name = models.CharField(
-        'Название', max_length=INGREDIENT_NAME_MAX_LENGTH,
-        help_text='Название продукта.'
-    )
-    measurement_unit = models.CharField(
-        'Единица измерения', max_length=INGREDIENT_MUNIT_MAX_LENGTH,
-        help_text='Единица измерения продукта.'
-    )
-
-    class Meta:
-        default_related_name = 'ingredients'
-        verbose_name = 'Продукт'
-        verbose_name_plural = 'Продукты'
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name[:DESCRIPTION_LENGTH]
-
-
 class Tag(models.Model):
     name = models.CharField(
         'Название', max_length=TAG_NAME_MAX_LENGTH, unique=True,
@@ -114,6 +94,26 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name[:DESCRIPTION_LENGTH]
+
+
+class Ingredient(models.Model):
+    name = models.CharField(
+        'Название', max_length=INGREDIENT_NAME_MAX_LENGTH,
+        help_text='Название продукта.'
+    )
+    measurement_unit = models.CharField(
+        'Единица измерения', max_length=INGREDIENT_MUNIT_MAX_LENGTH,
+        help_text='Единица измерения продукта.'
+    )
+
+    class Meta:
+        default_related_name = 'ingredients'
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
         ordering = ('name',)
 
     def __str__(self):
@@ -167,7 +167,7 @@ class RecipeComponent(models.Model):
     amount = models.PositiveSmallIntegerField(
         'Мера',
         validators=[MinValueValidator(MIN_INGREDIENT_AMOUNT)],
-        help_text='Единица измерений продукта'
+        help_text='Количество'
     )
 
     class Meta:

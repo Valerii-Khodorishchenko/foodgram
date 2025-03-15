@@ -114,6 +114,7 @@ USE_TZ = True
 STATIC_URL = '/backend_static/'
 
 STATICFILES_DIRS = (BASE_DIR / 'static',)
+
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -134,19 +135,12 @@ AUTH_USER_MODEL = 'recipe.User'
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'PERMISSIONS': {
-        'activation': ('api.permissions.DenyAccessPermission',),
-        'password_reset': ('api.permissions.DenyAccessPermission',),
-        'password_reset_confirm': ('api.permissions.DenyAccessPermission',),
-        'username_reset': ('api.permissions.DenyAccessPermission',),
-        'username_reset_confirm': ('api.permissions.DenyAccessPermission',),
-        'set_username': ('api.permissions.DenyAccessPermission',),
         'user': ('rest_framework.permissions.AllowAny',),
         'user_list': ('rest_framework.permissions.AllowAny',),
     },
     'SERIALIZERS': {
         'user': 'api.serializers.UserSerializer',
         'current_user': 'api.serializers.UserSerializer',
-        'user_create': 'api.serializers.UserCreateSerializer',
     },
     'HIDE_USERS': False
 }

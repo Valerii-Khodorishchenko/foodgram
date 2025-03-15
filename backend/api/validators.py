@@ -17,9 +17,15 @@ def validate_required_fields(data, fields):
 def validate_products(products):
     if not products:
         raise ValidationError('Поле не может быть пустым.')
-    unique_products = {product['id'] for product in products}
-    if len(products) != len(unique_products):
-        raise ValidationError('Ингредиенты не должны повторяться.')
+    duplicate_products = set(
+        [product['id'].name for product in products
+         if products.count(product) > 1]
+    )
+    if duplicate_products:
+        raise ValidationError(
+            'Продукты не должны повторяться. '
+            'Повторяющиеся продукты: {}'.format(', '.join(duplicate_products))
+        )
     return products
 
 

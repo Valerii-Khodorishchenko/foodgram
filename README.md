@@ -17,7 +17,6 @@
 - [Основной функционал](#основной-функционал)
 - [Установка](#установка)
   - [Как заполнить .env](#как-заполнить-env) 
-  - [Структура проекта](#структура-проекта)
 - [Запуск локально в режиме CORS](#запуск-локально-в-режиме-cors) (для разработки и тестирования)
   - [Запуск backend сервера Django](#запуск-backend-сервера-django)
   - [Запуск frontend сервера React](#запуск-frontend-сервера-react)
@@ -77,7 +76,7 @@
 ## Установка
 >Пример всех команд приведён в ***bash sell***.
 
-<p>Клонируйте репозиторий любым удобным способом, например</p>
+Клонируйте репозиторий любым удобным способом, например
 
 ```bash
 git clone https://github.com/Valerii-Khodorishchenko/foodgram.git
@@ -149,74 +148,16 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 nano .env
 ```
 
-## Структура проекта
-```bash
-├── backend  # Django + Django REST Framework бэкенд
-│   ├── api/
-│   ├── backend/
-│   ├── recipe/
-│   │   ├── __init__.py
-│   │   ├── admin/
-│   │   │   ├── __init__.py
-│   │   │   ├── filters.py
-│   │   │   ├── mixins.py
-│   │   │   ├── recipe_admin.py
-│   │   │   └── user_admin.py
-│   │   ├── apps.py
-│   │   ├── constants.py
-│   │   ├── management/
-│   │   │   ├── base_import.py
-│   │   │   └── commands
-│   │   │       ├── load_ingredients.py
-│   │   │       └── load_tags.py
-│   │   ├── models.py
-│   │   ├── urls.py
-│   │   ├── validators.py
-│   │   └── views.py
-│   ├── Dockerfile
-│   ├── Dockerfile.bak
-│   ├── entrypoint.sh
-│   ├── entrypoint.sh.bak
-│   ├── manage.py
-│   ├── requirements.txt
-│   └── static/fonts/ arial.ttf
-├── data  # Данные для .db
-│   ├── ingredients.csv  # Ингредиенты
-│   ├── ingredients.json
-│   ├── fixtures_db.json  # Фикстуры
-│   ├── superuser.sh  # Скрипт создания Администратора
-│   ├── tags.csv  # Теги 
-│   └── tags.json
-├── docs/  # Документация
-├── frontend/  # React - фронтенд 
-├── gateway
-│   ├── Dockerfile
-│   └── nginx.conf
-├── infra
-│   ├── docker-compose.yml
-│   ├── docker-compose.yml.bak
-│   └── nginx.conf
-├── postman_collection  # Postman тесты
-│   ├── README.md
-│   ├── clear_db.sh  # Скрипт очистки .db от тестовых случаев
-│   └── foodgram.postman_collection.json  # Postman коллекция 
-├── venv/  # виртуальное окружение
-├── .env  # файл переменных окружения
-├── .gitignore
-├── docker-compose.production.yml
-├── docker-compose.yml
-├── README.md
-└── setup.cfg
-```
 ## Запуск локально в режиме CORS.
 ### Запуск backend сервера Django:
-Создать миграции.
-```bash
-python3 backend/manage.py makemigrations recipe
-```
+
 Выполнить миграции.
 ```bash
 python3 backend/manage.py migrate
+```
+Загрузить фикстуры.
+```bash
+python3 backend/manage.py loaddata backend/fixtures_db.json
 ```
 Запустить `backend` сервер.
 ```bash
@@ -238,11 +179,14 @@ npm run start
 ```
 ### Приложение запущено.
 Далее приложение самостоятельно откроется в браузере по адресу 
-http://localhost:3000/recipes в режиме `frontend + backend`
+[http://localhost:3000/recipes](http://localhost:3000/recipes) в режиме 
+`frontend + backend`
 
 Отдельно для просмотра `backend`-сервера доступны адреса:
-- админ панель http://localhost:8000/admin/
-- api http://localhost:8000/api/
+- документация к API [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- админ панель [http://localhost:8000/admin/](http://localhost:8000/admin/)
+- api [http://localhost:8000/api/](http://localhost:8000/api/)
+
 
 Для остановки `backend`-сервера используйте сочетание клавиш `CTRL+C`
 
@@ -285,9 +229,6 @@ python3 backend/manage.py load_ingredients data/ingredients.json
 -  ```data``` путь к директории с файлами для заполнения ```.db``` 
 формате ```.csv``` и ```.json```.
 
-В директории ```data/``` есть образцы файлов ```ingredients.csv``` и 
-```ingredients.json```.
-
 ### Заполнение .db тегами из .CSV или .JSON файла
 В проекте реализована возможность добавления тегов в базу данных 
 без дублирования тегов.
@@ -303,21 +244,7 @@ python3 backend/manage.py load_tags data/tags.json
 формате ```.csv``` и ```.json```.
 
 В директории ```data/``` есть образцы файлов ```tags.csv``` и ```tags.json```.
-### Загрузка/выгрузка фикстур
-Загрузка фикстур
-```bash
-python3 backend/manage.py loaddata data/fixtures_db.json
-```
-Выгрузка фикстур
-Для Linux:
-```bash
-python3 backend/manage.py dumpdata --indent 2 -o data/fixtures_db.json
-```
-Для Windows:
-```bash
-py -Xutf8 backend/manage.py dumpdata --indent 2 -o data/fixtures_db.json
-```
-## Запуск локально Docker Compose с общими томами
+
 <!-- # Просмотр спецификации API и frontend веб-приложения
 Находясь в папке infra, выполните команду docker-compose up. При выполнении 
 этой команды контейнер frontend, описанный в docker-compose.yml, подготовит 
