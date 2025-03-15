@@ -187,6 +187,10 @@ npm run start
 - админ панель [http://localhost:8000/admin/](http://localhost:8000/admin/)
 - api [http://localhost:8000/api/](http://localhost:8000/api/)
 
+Для работы над проектом доступна документация:
+- swagger [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
+- ReDoc [http://127.0.0.1:8000/api/redoc/](http://127.0.0.1:8000/api/redoc/)
+
 
 Для остановки `backend`-сервера используйте сочетание клавиш `CTRL+C`
 

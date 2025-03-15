@@ -29,6 +29,8 @@ INSTALLED_APPS += [
     'djoser',
     'debug_toolbar',
     'django_filters',
+    'drf_yasg',
+    'drf_spectacular',
 ]
 
 INSTALLED_APPS += [
@@ -52,7 +54,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'docs',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -113,7 +115,7 @@ USE_TZ = True
 
 STATIC_URL = '/backend_static/'
 
-STATICFILES_DIRS = (BASE_DIR / 'static',)
+STATICFILES_DIRS = (BASE_DIR / 'static', BASE_DIR / 'api',)
 
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
@@ -128,6 +130,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'api.paginators.LimitPagePagination',
     'PAGE_SIZE': 6,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 AUTH_USER_MODEL = 'recipe.User'
