@@ -155,10 +155,21 @@ nano .env
 ```bash
 python3 backend/manage.py migrate
 ```
-Загрузить фикстуры.
+**Загрузить фикстур.**
+
+Заполненная примерами примерами:
 ```bash
 python3 backend/manage.py loaddata backend/fixtures_db.json
 ```
+Или без примеров, отдельно ингридиенты
+```bash
+backend/manage.py loaddata backend/ingredient_db.json
+```
+отдельно тенги:
+```bash
+backend/manage.py loaddata backend/tag_db.json
+```
+
 Запустить `backend` сервер.
 ```bash
 python3 backend/manage.py runserver

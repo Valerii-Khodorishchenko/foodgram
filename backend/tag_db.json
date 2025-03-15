@@ -1,0 +1,66 @@
+[
+    {
+        "model": "recipe.tag",
+        "pk": 1,
+        "fields": {
+            "name": "Завтрак",
+            "slug": "breakfast"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 2,
+        "fields": {
+            "name": "Обед",
+            "slug": "lunch"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 3,
+        "fields": {
+            "name": "Ужин",
+            "slug": "dinner"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 4,
+        "fields": {
+            "name": "Закуски",
+            "slug": "snacks"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 5,
+        "fields": {
+            "name": "Горячее",
+            "slug": "hot-dishes"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 6,
+        "fields": {
+            "name": "Десерты",
+            "slug": "desserts"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 7,
+        "fields": {
+            "name": "Салаты",
+            "slug": "salads"
+        }
+    },
+    {
+        "model": "recipe.tag",
+        "pk": 8,
+        "fields": {
+            "name": "Напитки",
+            "slug": "drinks"
+        }
+    }
+]
