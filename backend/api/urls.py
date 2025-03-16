@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import url
 from django.urls import include, path
 from drf_yasg.views import get_schema_view
@@ -32,8 +33,8 @@ schema_view = get_schema_view(
         title='Foodgram API',
         default_version='1.0.0',
         description='''Документация для приложения Foodgram API.
-        API для управления рецептами, ингредиентами, подписками и 
-        пользователями.
+        API для управления рецептами, ингредиентами, подписками и
+         пользователями.
         ''',
         contact=openapi.Contact(email='Khodorishchenko.Valerii@yandex.ru'),
         license=openapi.License(name='BSD License'),
@@ -41,11 +42,12 @@ schema_view = get_schema_view(
     public=True,
 )
 
-urlpatterns += [
-   url(r'^swagger(?P<format>\.json|\.yaml)$', 
-       schema_view.without_ui(cache_timeout=0), name='schema-json'),
-   url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
-       name='schema-swagger-ui'),
-   url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
-       name='schema-redoc'),
-]
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^swagger(?P<format>\.json|\.yaml)$',
+            schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
+            name='schema-swagger-ui'),
+        url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0),
+            name='schema-redoc'),
+    ]

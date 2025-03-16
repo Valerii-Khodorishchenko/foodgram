@@ -41,7 +41,8 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:production
+          target: production
 
   build_frontend_and_push_to_docker_hub:
     name: Push frontend Docker image to Docker Hub

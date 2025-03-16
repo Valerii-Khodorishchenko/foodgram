@@ -115,7 +115,7 @@ USE_TZ = True
 
 STATIC_URL = '/backend_static/'
 
-STATICFILES_DIRS = (BASE_DIR / 'static', BASE_DIR / 'api',)
+STATICFILES_DIRS = (BASE_DIR / 'static',)
 
 STATIC_ROOT = BASE_DIR / 'collected_static'
 

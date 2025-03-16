@@ -11,3 +11,5 @@ numpy==1.23.5
 djoser==2.1.0
 drf-extra-fields==3.4.0
 pymorphy2==0.9.1
+drf-spectacular==0.28.0
+drf_yasg==1.21.10

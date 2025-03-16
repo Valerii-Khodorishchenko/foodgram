@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 class BaseImport(BaseCommand):
     help = 'Импорт данных из CSV и JSON файлов'
-    unique_fields = ('name',)
     model = None
 
     def add_arguments(self, parser):
@@ -17,7 +16,6 @@ class BaseImport(BaseCommand):
         try:
             if file_path.endswith('.csv'):
                 added_count = self.load_from_csv(file_path)
-                print(added_count)
             elif file_path.endswith('.json'):
                 added_count = self.load_from_json(file_path)
             else:
@@ -36,18 +34,20 @@ class BaseImport(BaseCommand):
             self.stdout.write(self.style.ERROR(f'Ошибка импорта: {e}'))
 
     def create(self, data):
-        new_objects = [
-            self.model(**item) for item in data
-            if not (self.unique_fields and self.model.objects.filter(
-                **{fld: item[fld] for fld in self.unique_fields if fld in item}
-            ).exists())
-        ]
-        return len(self.model.objects.bulk_create(new_objects))
+        return len(self.model.objects.bulk_create(
+            [self.model(**item) for item in data],
+            ignore_conflicts=True
+        ))
+
+    def load_from_file(self, file_path, file_type):
+        with open(file_path, 'r', encoding='utf-8') as file:
+            if file_type == 'csv':
+                return csv.DictReader(file)
+            elif file_type == 'json':
+                return json.load(file)
 
     def load_from_csv(self, file_path):
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return self.create(csv.DictReader(file))
+        return self.create(self.load_from_file(file_path, 'csv'))
 
     def load_from_json(self, file_path):
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return self.create(json.load(file))
+        return self.create(self.load_from_file(file_path, 'json'))

@@ -14,7 +14,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
   backend:
-    image: valera1991/foodgram_backend
+    image: valera1991/foodgram_backend:production
     container_name: foodgram_backend
     env_file: .env
     depends_on:

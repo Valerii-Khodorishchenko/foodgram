@@ -196,6 +196,13 @@ class UserRecipeRelation(models.Model):
 
     class Meta:
         abstract = True
+        default_related_name = '%(class)ss'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_category_recipe'
+            ),
+        )
 
     def __str__(self):
         return f'{self.user} -> {self.recipe}'
@@ -206,13 +213,6 @@ class Favorites(UserRecipeRelation):
         default_related_name = 'favorites'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'recipe'),
-                name='unique_favorite_recipe'
-            ),
-        )
-        unique_together = ('user', 'recipe')
 
 
 class Cart(UserRecipeRelation):

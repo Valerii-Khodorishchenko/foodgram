@@ -32,7 +32,7 @@ class CookingTimeFilter(admin.SimpleListFilter):
                 quick,
                 self.filter_by_time_range(
                     recipes,
-                    self.filter_range.get('quick')
+                    self.filter_range['quick']
                 ).count()
             )),
             ('medium', 'быстрее {0} минут ({1})'.format(
@@ -42,7 +42,7 @@ class CookingTimeFilter(admin.SimpleListFilter):
                     self.filter_range.get('medium')
                 ).count()
             )),
-            ('slow', 'долше {0} минут ({1})'.format(
+            ('slow', '{0} минут и дольше ({1})'.format(
                 medium,
                 self.filter_by_time_range(
                     recipes,
