@@ -11,6 +11,8 @@ class CookingTimeFilter(admin.SimpleListFilter):
         cooking_times = numpy.array(
             queryset.values_list('cooking_time', flat=True)
         )
+        if not cooking_times.size:
+            return 0, 0
         quick = int(numpy.floor(numpy.percentile(cooking_times, 33)))
         medium = int(numpy.floor(numpy.percentile(cooking_times, 66)))
         return quick, medium

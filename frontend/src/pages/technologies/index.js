@@ -22,13 +22,22 @@ const Technologies = () => {
                 Python
               </li>
               <li className={styles.textItem}>
-                Django
+                Бэкенд: Django + Django REST Framework
               </li>
               <li className={styles.textItem}>
-                Django REST Framework
+                Работа с ползователями: Djoser
               </li>
               <li className={styles.textItem}>
-                Djoser
+                База данных: PostgreSQL
+              </li>
+              <li className={styles.textItem}>
+                Запуск и проксирование: Gunicorn, Nginx
+              </li>
+              <li className={styles.textItem}>
+                Контейнеризация: Docker, Docker Compose 
+              </li>
+              <li className={styles.textItem}>
+                CI/CD: GitHub Actions (линтинг Flake8, деплой)
               </li>
             </ul>
           </div>

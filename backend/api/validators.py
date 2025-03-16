@@ -14,27 +14,28 @@ def validate_required_fields(data, fields):
             {field: 'Обязательное поле.' for field in missing_fields})
 
 
-def validate_products(products):
-    if not products:
-        raise ValidationError('Поле не может быть пустым.')
-    duplicate_products = set(
-        [product['id'].name for product in products
-         if products.count(product) > 1]
-    )
-    if duplicate_products:
+def validate_unique_items(items, item_name):
+    if not items:
+        raise ValidationError(f'Поле {item_name} не может быть пустым.')
+    names = [
+        item['id'].name if isinstance(
+            item, dict
+        ) else item.name for item in items
+    ]
+    duplicate_items = set([item for item in names if names.count(item) > 1])
+    if duplicate_items:
+        duplicate_items_str = [str(item) for item in duplicate_items]
         raise ValidationError(
-            'Продукты не должны повторяться. '
-            'Повторяющиеся продукты: {}'.format(', '.join(duplicate_products))
+            '{} не должны повторяться. Повторяющиеся {}: {}'.format(
+                item_name, item_name.lower(), duplicate_items_str
+            )
         )
-    return products
+    return items
+
+
+def validate_products(products):
+    return validate_unique_items(products, 'Продукты')
 
 
 def validate_tags(tags):
-    if not tags:
-        raise ValidationError('Поле не может быть пустым.')
-    unique_tags = {tag.id for tag in tags}
-    if len(tags) != len(unique_tags):
-        raise ValidationError(
-            'Теги не должны повторяться.'
-        )
-    return tags
+    return validate_unique_items(tags, 'Теги')

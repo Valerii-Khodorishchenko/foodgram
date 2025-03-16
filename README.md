@@ -1,4 +1,6 @@
 # [Foodgram](https://fastfoodgram.sytes.net/)
+![Workflow Badge](https://github.com/Valerii-Khodorishchenko/foodgram/actions/workflows/main.yml/badge.svg)
+
 
 [![Django](https://img.shields.io/badge/Django-3.2.3-092E20?logo=django&logoColor=white)](https://docs.djangoproject.com/en/3.2/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
@@ -10,7 +12,7 @@
 [![Gunicorn](https://img.shields.io/badge/Gunicorn-20.1.0-499848?logo=gunicorn&logoColor=white)](https://docs.gunicorn.org/)
 [![Nginx](https://img.shields.io/badge/Nginx-1.25.4-009639?logo=nginx&logoColor=white)](https://nginx.org/)
 
-**Foodgram** — это веб-сервис для публикации и обмена рецептами. Пользователи могут добавлять рецепты в избранное, подписываться на других авторов, а также формировать удобный список покупок на основе выбранных блюд.
+**Foodgram** — это веб-сервис для публикации и обмена рецептами. Пользователи могут добавлять рецепты в избранное, подписываться на других авторов, а также формировать удобный список покупок на основе выбранных блюд. 
 
 - [Описание](#foodgram)
 - [Основные технологии](#основные-технологии)
@@ -21,49 +23,36 @@
   - [Запуск backend сервера Django](#запуск-backend-сервера-django)
   - [Запуск frontend сервера React](#запуск-frontend-сервера-react)
   - [Остановка, повторный запуск](#приложение-запущено)
-- [Запуск локально Docker Compose с общими томами]() (для разработки)
-- [API Документация]() 
+- [Запуск локально Docker Compose с общими томами](#запуск-локально-docker-compose-с-общими-томами) (для разработки)
+- [API Документация](https://fastfoodgram.sytes.net/api/docs/) 
 - [Заполнение .db](#заполнение-db)
   - [Создание суперпользователя](#создание-суперпользователя)
   - [Заполнение .db ингридиентами из .CSV или .JSON файла](#заполнение-db-ингридиентами-из-csv-или-json-файла)
   - [Заполнение .db тегами из .CSV или .JSON файла](#заполнение-db-тегами-из-csv-или-json-файла)
   - [Загрузка фикстур](#загрузка-фикстур)
-- [Запуск тестов]()
-- [Запуск локально Docker Compose]() (для проверки перед деплоем)
-- [Деплой Docker-Compos]() 
-- [Настройка CI/CD через Action GitHub]
+- [Запуск тестов](#запуск-тестов)
+- [Запуск локально Docker Compose](#запуск-локально-docker-compose) (для проверки перед деплоем)
+- [Деплой Docker-Compos](#деплой-docker-compos) 
+- [Настройка CI/CD через Action GitHub](#настройка-cicd-через-action-github)
 
 ## Основные технологии
 - **Бэкенд:** Django + Django REST Framework
+- **Работа с ползователями** Djoser
 - **Фронтенд:** React *(написан не мной)
 - **База данных:** PostgreSQL
+- **Запуск и проксирование** Gunicorn, Nginx
 - **Контейнеризация:** Docker, Docker Compose  
 - **CI/CD:** GitHub Actions (линтинг, деплой)
 - <details>
   <summary>Еще технологии</summary>
-    <br>
 
     - Оптимизация: django-debug-toolbar 3.2.3 для анализа и
     оптимизации запросов 
-    - Работа с изображениями: Pillow 9.0.0
-    - Корс: django-cors-headers 3.7.0 для поддержки CORS
+    - drf_yasg, drf_spectacular для [статической](https://fastfoodgram.sytes.net/api/docs/) и [динамической](#приложение-запущено) спецификации API
     - Фильтрация: django-filter 2.4.0
-    - Документация: ReportLab 4.2.5 для генерации PDF
     - Постоянное хранение: PostgreSQL через psycopg2-binary 2.9.3
-    - Производительность: numpy 1.23.5 для обработки данных
-    - **Gunicorn** — WSGI HTTP сервер, использованный для запуска бэкенда Django в продакшн-среде.
-    - Запуск: Gunicorn 20.1.0 для продакшн-сервера
     - Код-стайл: Flake8 6.0.0 для линтинга кода
     - Конфигурации: python-dotenv 1.0.1 для работы с переменными окружения
-    - Проксирование: Nginx для проксирования запросов и управления статическими файлами
-    <br><br>
-    - **работу с различными форматами файлов и генерацию списка покупок(#TODO)**
-    - **ReportLab**: Генерация PDF-файлов для создания списка покупок с возможностью использования пользовательских шрифтов.
-    - **CSV**: Создание и экспорт списка покупок в формате CSV.
-    - **Python I/O**: Использование `BytesIO` и `StringIO` для работы с динамическими файлами в памяти.
-
-Данный проект демонстрирует работу с различными форматами файлов и генерацию отчетности для списка покупок.
-
 </details>
 
 ## Основной функционал
@@ -155,20 +144,7 @@ nano .env
 ```bash
 python3 backend/manage.py migrate
 ```
-**Загрузить фикстур.**
-
-Заполненная примерами примерами:
-```bash
-python3 backend/manage.py loaddata backend/fixtures_db.json
-```
-Или без примеров, отдельно ингридиенты
-```bash
-backend/manage.py loaddata backend/ingredient_db.json
-```
-отдельно тенги:
-```bash
-backend/manage.py loaddata backend/tag_db.json
-```
+[**Загрузить фикстуры если необходима заполненная примерами БД**](загрузка-фикстур)
 
 Запустить `backend` сервер.
 ```bash
@@ -198,8 +174,8 @@ npm run start
 - админ панель [http://localhost:8000/admin/](http://localhost:8000/admin/)
 - api [http://localhost:8000/api/](http://localhost:8000/api/)
 
-Для работы над проектом доступна документация:
-- swagger [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/swagger/)
+Для работы над проектом доступна динамическая документация:
+- swagger [http://127.0.0.1:8000/swagger/](http://127.0.0.1:8000/api/swagger/)
 - ReDoc [http://127.0.0.1:8000/api/redoc/](http://127.0.0.1:8000/api/redoc/)
 
 
@@ -220,6 +196,17 @@ python3 backend/manage.py runserver
 - Запустить `frontend`-сервер.
 ```bash
 npm run start
+```
+## Запуск локально Docker Compose с общими томами
+Запустить Docker Compose командой
+```bash
+docker compose -f docker-compose.development.yml up --build
+```
+В этом варианте использования все изменения в проекте сразу попадут в контейнер.
+
+Для остановки
+```bash
+docker compose -f docker-compose.development.yml down
 ```
 
 ## Заполнение .db
@@ -260,16 +247,65 @@ python3 backend/manage.py load_tags data/tags.json
 
 В директории ```data/``` есть образцы файлов ```tags.csv``` и ```tags.json```.
 
-<!-- # Просмотр спецификации API и frontend веб-приложения
-Находясь в папке infra, выполните команду docker-compose up. При выполнении 
-этой команды контейнер frontend, описанный в docker-compose.yml, подготовит 
-файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою 
-работу.
-
-По адресу http://localhost изучите фронтенд веб-приложения, а по адресу 
-http://localhost/api/docs/ — спецификацию API. -->
-
-## Doker-compose
+### Загрузка фикстур
+Заполненная примерами примерами:
 ```bash
- docker compose -f docker-compose.pre-production.yml up --build
+python3 backend/manage.py loaddata backend/fixtures_db.json
+```
+Или без примеров, отдельно ингридиенты
+```bash
+backend/manage.py loaddata backend/ingredient_db.json
+```
+отдельно тенги:
+```bash
+backend/manage.py loaddata backend/tag_db.json
+```
+
+## Запуск тестов
+Инструкция по запуску тестов расположена по ссылке
+
+https://github.com/Valerii-Khodorishchenko/foodgram/blob/main/postman_collection/README.md
+
+## Запуск локально Docker Compose
+Для проверки работоспособности проекта перед отправкой на удалённый сервер запустите проект локально
+```bash
+docker compose -f docker-compose.pre-production.yml up --build
+```
+Для остановки
+```bash
+docker compose -f docker-compose.pre-production.yml down
+```
+## Деплой Docker-Compos
+Для сборки собственных образов необходимо иметь аккаунт на https://hub.docker.com/
+Сборка собственных образов и отправка на `dockerhub`
+```bash
+cd backend
+docker build --target production -t docker_username/foodgram_backend:production
+docker push docker_username/foodgram_backend:production
+
+cd ../frontend
+docker build docker_username/foodgram_frontend
+docker push docker_username/foodgram_frontend
+
+cd ../gateway
+docker build docker_username/foodgram_gateway
+docker push docker_username/foodgram_gateway
+```
+
+Измените названия образов на собственные в `docker-compose.pre-production.yml` и можно его отправить на ваш удалённый сервер любым удобным образом. В директории с `docker-compose.pre-production.yml` необходимо создать [`.env`](#как-заполнить-env)
+
+## Настройка CI/CD через Action GitHub
+Необходимо в репозитории проекта перейти
+
+` Settings -> Security -> Secrets and variable -> Actions -> Secrets`
+и создать Secrets
+```bash
+HOST              # IP-адрес вашего сервера
+USER              # имя пользователя сервера
+SSH_KEY           # закрытый SSH-ключ
+SSH_PASSPHRASE    # (парольная фраза) для SSH-ключа
+DOCKER_PASSWORD   # пароль docker
+DOCKER_USERNAME   # имя пользователя docker
+TELEGRAM_TO       # ID телеграм-аккаунта
+TELEGRAM_TOKEN    # токен бота отправляющего сообщение
 ```
