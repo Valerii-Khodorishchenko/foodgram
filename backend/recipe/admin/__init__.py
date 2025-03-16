@@ -4,9 +4,7 @@ from django.contrib import admin
 from recipe.admin.user_admin import (
     UserAdmin,
     FavoritesCartAdmin,
-    # FavoritesAdmin,
     FollowAdmin,
-    # CartAdmin
 )
 from recipe.admin.recipe_admin import (
     IngredientAdmin,

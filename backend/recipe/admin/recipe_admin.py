@@ -57,10 +57,11 @@ class RecipeAdmin(DisplayImageMixin, BaseAdmin):
         return recipe.favorites.count()
 
 
-class RecipeIngredientInline(admin.StackedInline):
+class RecipeIngredientInline(admin.TabularInline):
     model = RecipeComponent
     extra = 1
     fields = ('product', 'amount', 'measurement_unit')
+    raw_id_fields = ('product',)
     readonly_fields = ('measurement_unit',)
 
     def get_queryset(self, request):
