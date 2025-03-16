@@ -200,7 +200,7 @@ class UserRecipeRelation(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='unique_category_recipe'
+                name='unique_%(class)ss_recipe'
             ),
         )
 
@@ -209,14 +209,14 @@ class UserRecipeRelation(models.Model):
 
 
 class Favorites(UserRecipeRelation):
-    class Meta:
+    class Meta(UserRecipeRelation.Meta):
         default_related_name = 'favorites'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные'
 
 
 class Cart(UserRecipeRelation):
-    class Meta:
+    class Meta(UserRecipeRelation.Meta):
         default_related_name = 'carts'
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзины'

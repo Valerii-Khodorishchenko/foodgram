@@ -25,8 +25,8 @@ class CookingTimeFilter(admin.SimpleListFilter):
         quick, medium = self.separators(recipes)
         self.filter_range = {
             'quick': (0, quick),
-            'medium': (quick, medium),
-            'slow': (medium, 999999999)
+            'medium': (quick + 1, medium),
+            'slow': (medium + 1, 999999999)
         }
 
         return (

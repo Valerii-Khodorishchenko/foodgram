@@ -3,7 +3,7 @@ from djoser.serializers import UserSerializer as DjoserUserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-
+from recipe.constants import MIN_INGREDIENT_AMOUNT
 from recipe.models import (
     Cart,
     Favorites,
@@ -25,7 +25,7 @@ class UserSerializer(DjoserUserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta(DjoserUserSerializer.Meta):
-        fields = DjoserUserSerializer.Meta.fields + ('is_subscribed', 'avatar')
+        fields = (*DjoserUserSerializer.Meta.fields, 'is_subscribed', 'avatar')
 
     def get_is_subscribed(self, author):
         request = self.context.get('request')
@@ -149,7 +149,7 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
 
 class WriteRecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField(min_value=1)
+    amount = serializers.IntegerField(min_value=MIN_INGREDIENT_AMOUNT)
 
     class Meta:
         model = RecipeComponent
@@ -169,7 +169,7 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        exclude = ['author']
+        exclude = ('author',)
 
     def validate_image(self, image):
         return validate_image(image)
@@ -190,7 +190,6 @@ class RecipeCreatePatchSerializer(serializers.ModelSerializer):
             )
             for ingredient_data in ingredients_data
         )
-        recipe.refresh_from_db()
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
